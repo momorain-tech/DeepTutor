@@ -1,4 +1,6 @@
 'use client'
+
+import { withBasePath } from "@/lib/base-path";
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -89,7 +91,7 @@ export default function NoteTaskBlock({
               )
             }
           />
-          <a href="/kanban" className="text-xs text-[var(--primary)]">
+          <a href={withBasePath("/kanban")} className="text-xs text-[var(--primary)]">
             {t('Open task board')}
           </a>
         </>

@@ -1,3 +1,4 @@
+import { withBasePath } from "@/lib/base-path";
 export interface SocketMessageEvent {
   data: unknown;
 }
@@ -18,5 +19,5 @@ export const SOCKET_CONNECTING = 0;
 export const SOCKET_OPEN = 1;
 
 export function browserSocketFactory(url: string): TurnSocket {
-  return new WebSocket(url) as unknown as TurnSocket;
+  return new WebSocket(withBasePath(url)) as unknown as TurnSocket;
 }

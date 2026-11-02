@@ -444,6 +444,15 @@ async def require_auth(
     endpoint to read the unset default. That regression was the root cause
     of #481.
     """
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        payload = getattr(getattr(request, "state", None), "momorain_payload", None)
+        if payload is None:
+            raise HTTPException(401, "请先登录 momorain")
+        _install_current_user(payload)
+        _install_request_workspace(request)
+        return payload
+
     if not AUTH_ENABLED:
         _install_current_user(None)
         _install_request_workspace(request)
@@ -567,6 +576,21 @@ async def ws_require_auth(ws: WebSocket) -> _CtxToken | _WsAuthFailed:
         finally:
             reset_current_user(user_token)
     """
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        payload = getattr(ws.state, "momorain_payload", None)
+        if payload is None:
+            await ws.close(code=4401)
+            return ws_auth_failed
+        user_token = _install_current_user(payload)
+        try:
+            _install_request_workspace(ws)
+        except HTTPException:
+            reset_current_user(user_token)
+            await ws.close(code=4404)
+            return ws_auth_failed
+        return user_token
+
     payload = None
     if AUTH_ENABLED:
         token = ws.query_params.get("token") or ws.cookies.get(_COOKIE_NAME)
@@ -597,6 +621,10 @@ async def require_admin(
     the event loop and the user ContextVar set by ``require_auth`` is visible
     to the endpoint.
     """
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        raise HTTPException(404, "Not Found")
+
     if not AUTH_ENABLED:
         return _local_admin_token_payload()
 

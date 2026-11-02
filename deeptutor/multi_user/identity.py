@@ -511,3 +511,14 @@ def load_or_create_auth_secret() -> str:
     except Exception as exc:
         logger.warning("Failed to load/create auth secret at %s: %s", SECRET_FILE, exc)
         return secrets.token_hex(32)
+
+
+def ensure_external_user(user_id: str) -> None:
+    """建立外部身份的工作区引用；不提升首个用户、不保存可登录的密码。"""
+    with _USERS_WRITE_LOCK:
+        users = load_users()
+        if user_id in users:
+            return
+        users[user_id] = {"id": user_id, "hash": "!external-momorain", "role": "user",
+            "created_at": utc_now(), "disabled": False, "avatar": "", "preset": "standard"}
+        _write_users(users)

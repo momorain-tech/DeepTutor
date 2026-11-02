@@ -294,3 +294,7 @@ dmypy.json
 *.mp3
 *.wav
 *.ogg
+
+# momorain：公开构建参数可以入库；本地虚拟环境不入库。
+!web/.env.production
+.venv-web/

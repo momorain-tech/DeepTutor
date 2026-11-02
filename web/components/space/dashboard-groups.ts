@@ -288,8 +288,9 @@ export function visibleGroups(
       ...group,
       items: group.items.filter(
         (item) =>
-          !item.requiresCapability ||
-          (isAvailable?.(item.requiresCapability) ?? false),
+          (process.env.NEXT_PUBLIC_MOMORAIN_ENABLED !== "true" ||
+            !["/agents", "/space/mcp", "/space/cli-apps"].includes(item.href)) &&
+          (!item.requiresCapability || (isAvailable?.(item.requiresCapability) ?? false)),
       ),
     }))
     .filter((group) => group.items.length > 0);

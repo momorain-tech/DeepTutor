@@ -48,6 +48,11 @@ export function loginHref(returnPath: string): string {
   const query = new URLSearchParams({
     next: normalizeInternalReturnPath(returnPath),
   });
+  if (process.env.NEXT_PUBLIC_MOMORAIN_ENABLED === "true") {
+    const target = normalizeInternalReturnPath(returnPath, "/deeptutor/chat");
+    const next = target.startsWith("/deeptutor/") ? target : "/deeptutor" + target;
+    return `https://momorain.com/login?${new URLSearchParams({ next }).toString()}`;
+  }
   return `/login?${query.toString()}`;
 }
 

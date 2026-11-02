@@ -1,5 +1,7 @@
 "use client";
 
+
+import { withBasePath } from "@/lib/base-path";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2, RotateCw, TriangleAlert, X } from "lucide-react";
@@ -59,7 +61,7 @@ export default function SessionLoadingView({
       {/* Logo + spinner (or the failure mark) */}
       <div className="flex items-center gap-3">
         <img
-          src="/brand/black-logo.png"
+          src={withBasePath("/brand/black-logo.png")}
           alt="DeepTutor"
           width={32}
           height={32}

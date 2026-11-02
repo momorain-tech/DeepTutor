@@ -109,7 +109,11 @@ export function pageSections({
       ],
     },
   ]
-  return sections.map(section =>
+  const visibleSections = process.env.NEXT_PUBLIC_MOMORAIN_ENABLED === "true"
+    ? sections.filter(section => section.id !== "partners").map(section => ({...section,
+        pages: section.pages.filter(page => !["/agents", "/space/mcp", "/space/cli-apps"].includes(page.href))}))
+    : sections;
+  return visibleSections.map(section =>
     section.account ? { ...section, pages: section.pages.map(page => ({ ...page, account: true })) } : section
   )
 }

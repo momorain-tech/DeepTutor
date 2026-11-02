@@ -1,0 +1,42 @@
+# 网页专用部署：前端、API 和 nginx 在同一容器，数据独立挂卷。
+FROM node:22-bookworm-slim AS web
+WORKDIR /build/web
+RUN npm config set registry https://registry.npmmirror.com
+COPY web/package.json web/package-lock.json ./
+RUN npm ci --legacy-peer-deps
+COPY web/ ./
+COPY deeptutor/__version__.py /build/deeptutor/__version__.py
+ENV NODE_OPTIONS=--max-old-space-size=1536
+RUN npm run build
+
+FROM python:3.12-slim-bookworm AS runtime
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
+    PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple \
+    NODE_ENV=production MOMORAIN_ENABLED=true \
+    DEEPTUTOR_HOME=/app MOMORAIN_PUBLIC_ORIGIN=https://momorain.com \
+    DEEPTUTOR_API_BASE_URL=http://127.0.0.1:8001 \
+    NEXT_PUBLIC_BASE_PATH=/deeptutor NEXT_PUBLIC_MOMORAIN_ENABLED=true \
+    PORT=3001 HOSTNAME=127.0.0.1
+WORKDIR /app
+RUN sed -i 's|http://deb.debian.org|https://mirrors.tuna.tsinghua.edu.cn|g; s|http://security.debian.org|https://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update && apt-get install -y --no-install-recommends nginx supervisor ca-certificates fonts-noto-cjk libgomp1 curl \
+    && rm -rf /var/lib/apt/lists/*
+COPY requirements/ ./requirements/
+RUN pip install --no-cache-dir -r requirements/full.txt
+COPY --from=web /usr/local/bin/node /usr/local/bin/node
+COPY --from=web /build/web/.next/standalone/ ./web/
+COPY --from=web /build/web/.next/static/ ./web/.next/static/
+COPY --from=web /build/web/public/ ./web/public/
+COPY deeptutor/ ./deeptutor/
+COPY deeptutor_cli/ ./deeptutor_cli/
+COPY pyproject.toml build_metadata.py build_support.py ./
+COPY packages/ ./packages/
+COPY scripts/ ./scripts/
+COPY deploy/momorain/backup.py /app/backup.py
+COPY deploy/momorain/nginx.conf /etc/nginx/nginx.conf
+COPY deploy/momorain/supervisord.conf /etc/supervisor/conf.d/deeptutor.conf
+RUN mkdir -p /app/data /run/nginx && chmod 700 /app/data
+VOLUME ["/app/data"]
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=120s CMD curl -fsS http://127.0.0.1:8001/health/ready || exit 1
+CMD ["supervisord", "-n", "-c", "/etc/supervisor/conf.d/deeptutor.conf"]

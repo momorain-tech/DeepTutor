@@ -1,5 +1,6 @@
 'use client'
 
+import { withoutBasePath } from '@/lib/base-path'
 import { Suspense, useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { listWorkspaces } from '@/lib/workspaces-api'
@@ -27,7 +28,7 @@ function ScopeCanonicalizer() {
       rememberWorkspaceId(named)
       return
     }
-    router.replace(scopedUrl(`${window.location.pathname}${window.location.search}${window.location.hash}`))
+    router.replace(scopedUrl(`${pathname}${window.location.search}${window.location.hash}`))
   }, [named, pathname, router])
   useEffect(() => {
     const remembered = activeWorkspaceId()
@@ -37,7 +38,7 @@ function ScopeCanonicalizer() {
       .then(rows => {
         if (!alive || rows.some(row => row.workspace_id === remembered && row.kind === 'workspace')) return
         rememberWorkspaceId('')
-        void selectWorkspace('', `/${window.location.pathname.split('/')[1] || 'chat'}`)
+        void selectWorkspace('', `/${withoutBasePath(window.location.pathname).split('/')[1] || 'chat'}`)
       })
       .catch(() => undefined)
     return () => { alive = false }

@@ -1506,3 +1506,6 @@ a[href^="#dt-locator-"]:hover {
   visibility: hidden;
   pointer-events: none;
 }
+
+/* 使用本机字体，构建和页面都不依赖 Google Fonts 外网。 */
+.momorain-fonts { --font-sans: "PingFang SC", "Microsoft YaHei", Arial, sans-serif; --font-serif: "Songti SC", "SimSun", Georgia, serif; }

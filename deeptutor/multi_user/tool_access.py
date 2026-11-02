@@ -43,6 +43,10 @@ def _current_grant() -> dict | None:
 
 def allowed_optional_tools() -> set[str] | None:
     """Whitelist of user-toggleable tool names, ``None`` = unrestricted."""
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        # 首版只开放已接用户凭证的文本工具，独立图像/视频厂商配置后再开放。
+        return {"brainstorm", "web_search", "paper_search", "reason"}
     grant = _current_grant()
     if grant is None:
         return None
@@ -60,6 +64,10 @@ def allowed_mcp_tools() -> set[str] | None:
     turn cannot discover or load deployment-wide MCP host tools until an admin
     explicitly grants the tool names.
     """
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        return set()
+
     grant = _current_grant()
     if grant is None:
         return None
@@ -77,6 +85,10 @@ def allowed_cli_apps() -> set[str] | None:
     third-party code, and the deployment installing one is not the same decision
     as every account being able to run it.
     """
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        return set()
+
     grant = _current_grant()
     if grant is None:
         return None
@@ -88,6 +100,10 @@ def allowed_cli_apps() -> set[str] | None:
 
 def exec_override() -> bool | None:
     """Per-user exec override: ``None`` follows the deployment policy."""
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        return False
+
     grant = _current_grant()
     if grant is None:
         return None

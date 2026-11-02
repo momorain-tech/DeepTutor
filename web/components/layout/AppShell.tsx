@@ -1,5 +1,7 @@
 "use client";
 
+
+import { withBasePath } from "@/lib/base-path";
 import {
   createContext,
   useCallback,
@@ -117,14 +119,14 @@ export default function AppShell({ sidebar, pageBar, children, homeHref = "/" }:
             </button>
             <Link href={homeHref} className="flex items-center gap-1.5">
               <Image
-                src="/brand/color-logo.png"
+                src={withBasePath("/brand/color-logo.png")}
                 alt="DeepTutor"
                 width={20}
                 height={20}
                 className="h-5 w-5"
               />
               <Image
-                src="/brand/color-word.png"
+                src={withBasePath("/brand/color-word.png")}
                 alt="DeepTutor"
                 width={1200}
                 height={310}

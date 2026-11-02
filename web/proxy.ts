@@ -25,6 +25,8 @@ import {
 // only), so every rewrite would fail to connect.
 const API_BASE_URL = resolveBackendApiBase();
 
+const MOMORAIN_ENABLED = process.env.NEXT_PUBLIC_MOMORAIN_ENABLED === "true";
+
 const AUTH_ENABLED = parseAuthEnabled(
   process.env.DEEPTUTOR_AUTH_ENABLED ?? process.env.NEXT_PUBLIC_AUTH_ENABLED,
 );
@@ -59,6 +61,21 @@ export function proxy(req: NextRequest): NextResponse {
 
   if (isRetiredPagePath(pathname)) {
     return new NextResponse(null, { status: 404 });
+  }
+
+  if (MOMORAIN_ENABLED) {
+    if (/^\/(admin|partners|subagents|plugins|modules)(\/|$)/.test(pathname) ||
+        /^\/settings\/(cli|mcp|subagents|partners|providers|models|auth|plugins|modules)(\/|$)/.test(pathname)) {
+      return new NextResponse(null, { status: 404 });
+    }
+    if (pathname === "/login" || pathname === "/register") {
+      const central = new URL("https://momorain.com/login");
+      const next = req.nextUrl.searchParams.get("next");
+      central.searchParams.set("next", next?.startsWith("/deeptutor/") ? next : "/deeptutor/chat");
+      return NextResponse.redirect(central);
+    }
+    // 身份由 FastAPI 查询统一账号；页面可以先展示，付费动作必须经过后端门禁。
+    if (!isBackendPath(pathname)) return NextResponse.next();
   }
 
   // 1. Bridge the origin gap: forward backend-relative paths to the API server.

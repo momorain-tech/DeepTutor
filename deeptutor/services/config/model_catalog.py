@@ -270,6 +270,12 @@ class ModelCatalogService:
         # Reads may migrate defaults. Serialize the complete read/migrate/write
         # with settings updates so an older snapshot cannot overwrite a save
         # or hold the destination open during this instance's replace (#1984).
+        from deeptutor.momorain import enabled as momorain_enabled
+        if momorain_enabled():
+            from deeptutor.momorain.access import catalog, identity
+            if identity.get() is not None:
+                return catalog()
+
         with self._lock:
             loaded = self._read_existing_catalog()
             if loaded:
@@ -298,6 +304,12 @@ class ModelCatalogService:
         return loaded if isinstance(loaded, dict) else {}
 
     def save(self, catalog: dict[str, Any]) -> dict[str, Any]:
+        from deeptutor.momorain import enabled as momorain_enabled
+        if momorain_enabled():
+            from deeptutor.momorain.access import identity
+            if identity.get() is not None:
+                raise PermissionError("托管模型目录由 one-api 管理，不能写入本地")
+
         with self._lock:
             normalized = deepcopy(catalog)
             self._normalize(normalized)

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { withBasePath } from "@/lib/base-path";
 import { type ComponentType, type SVGProps, useId } from "react";
 
 /**
@@ -131,14 +133,14 @@ export function GeminiGlyph({ size = 16, ...props }: GlyphProps) {
 // offline. Sources are documented in public/agent-icons/README.md.
 export function KimiGlyph({ size = 16, ...props }: GlyphProps) {
   return (
-    <OfficialAssetGlyph src="/agent-icons/kimi.svg" size={size} {...props} />
+    <OfficialAssetGlyph src={withBasePath("/agent-icons/kimi.svg")} size={size} {...props} />
   );
 }
 
 export function OpencodeGlyph({ size = 16, ...props }: GlyphProps) {
   return (
     <OfficialAssetGlyph
-      src="/agent-icons/opencode.svg"
+      src={withBasePath("/agent-icons/opencode.svg")}
       size={size}
       {...props}
     />
@@ -148,7 +150,7 @@ export function OpencodeGlyph({ size = 16, ...props }: GlyphProps) {
 export function MimoGlyph({ size = 16, ...props }: GlyphProps) {
   return (
     <OfficialAssetGlyph
-      src="/agent-icons/mimo-code.svg"
+      src={withBasePath("/agent-icons/mimo-code.svg")}
       size={size}
       {...props}
     />
@@ -181,14 +183,14 @@ function OfficialAssetGlyph({
 
 export function HermesGlyph({ size = 16, ...props }: GlyphProps) {
   return (
-    <OfficialAssetGlyph src="/agent-icons/hermes.svg" size={size} {...props} />
+    <OfficialAssetGlyph src={withBasePath("/agent-icons/hermes.svg")} size={size} {...props} />
   );
 }
 
 export function OpenClawGlyph({ size = 16, ...props }: GlyphProps) {
   return (
     <OfficialAssetGlyph
-      src="/agent-icons/openclaw.svg"
+      src={withBasePath("/agent-icons/openclaw.svg")}
       size={size}
       {...props}
     />
@@ -198,7 +200,7 @@ export function OpenClawGlyph({ size = 16, ...props }: GlyphProps) {
 export function DeepSeekGlyph({ size = 16, ...props }: GlyphProps) {
   return (
     <OfficialAssetGlyph
-      src="/agent-icons/deepseek-harness.svg"
+      src={withBasePath("/agent-icons/deepseek-harness.svg")}
       size={size}
       {...props}
     />

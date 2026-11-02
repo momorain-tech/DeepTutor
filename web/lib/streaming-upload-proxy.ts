@@ -58,7 +58,7 @@ export async function forwardBackendUpload(
   const fetchImpl = dependencies.fetchImpl || globalThis.fetch;
   const incomingUrl = new URL(request.url);
   const upstreamUrl = new URL(
-    incomingUrl.pathname + incomingUrl.search,
+    incomingUrl.pathname.replace(/^\/deeptutor(?=\/|$)/, "") + incomingUrl.search,
     apiBaseUrl,
   );
 

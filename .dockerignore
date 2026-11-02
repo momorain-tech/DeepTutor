@@ -152,3 +152,6 @@ temp/
 # ============================================
 LICENSE
 Communication.md
+
+.venv-web/
+!web/.env.production

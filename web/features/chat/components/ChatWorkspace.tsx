@@ -1,5 +1,7 @@
 "use client";
 
+
+import { withBasePath } from "@/lib/base-path";
 import { COMMAND_CONFIRMATION_FAILED } from "@/features/chat/transport/command-delivery";
 
 import { ResourceReuseContext, useResourceReusePolicy } from "@/components/chat/home/ResourceReuse";
@@ -2608,7 +2610,7 @@ export default function ChatWorkspace() {
                 <div className="flex w-full flex-1 min-h-0 items-end justify-center overflow-hidden pb-14 animate-fade-in px-6">
                   <div className="w-full max-w-[960px] flex items-center justify-center gap-4">
                     <img
-                      src="/brand/black-logo.png"
+                      src={withBasePath("/brand/black-logo.png")}
                       alt="DeepTutor"
                       width={40}
                       height={40}

@@ -70,6 +70,17 @@ def is_owner_bound(profile: dict[str, Any]) -> bool:
 
 
 def redacted_model_access(user_id: str | None = None) -> dict[str, list[dict[str, Any]]]:
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        from deeptutor.momorain.access import catalog, PROFILE
+        current = get_current_user()
+        if user_id is not None and user_id != current.id:
+            return {"llm": []}
+        profiles = catalog()["services"]["llm"]["profiles"]
+        return {"llm": [{"profile_id": PROFILE, "model_id": m["id"], "model": m["model"],
+                          "name": m["name"], "profile_name": "momorain 托管", "provider": "custom",
+                          "source": "personal", "available": True} for m in profiles[0]["models"]]}
+
     user = get_current_user()
     if user_id is None:
         user_id = user.id

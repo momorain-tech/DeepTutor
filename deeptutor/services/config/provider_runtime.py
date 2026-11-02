@@ -865,6 +865,15 @@ def resolve_llm_runtime_config(
     a task profile that names a bare model still resolves against the
     credentials configured for chat.
     """
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        from deeptutor.momorain.access import resolve_model
+        access, model = resolve_model(llm_selection)
+        base = access["baseUrl"].rstrip("/") + "/v1"
+        return ResolvedLLMConfig(model=model["id"], provider_name="custom", provider_mode="standard",
+            binding="custom", api_key=access["key"], base_url=base, effective_url=base,
+            wire_api="chat_completions", api_format="openai_chat")
+
     catalog_service = service or get_model_catalog_service()
     loaded = _with_personal_llm_profiles(_load_catalog(catalog))
     # Parse the payload once: ``apply_llm_selection_to_catalog`` would otherwise
@@ -1147,6 +1156,17 @@ def resolve_embedding_runtime_config(
     service: ModelCatalogService | None = None,
 ) -> ResolvedEmbeddingConfig:
     """Resolve active embedding config using provider-runtime normalization."""
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        from deeptutor.momorain.access import resolve_model
+        embedding = (catalog or {}).get("services", {}).get("embedding", {})
+        selection = {"profile_id": embedding.get("active_profile_id"), "model_id": embedding.get("active_model_id")} if embedding else None
+        access, model = resolve_model(selection, capability="embedding")
+        base = access["baseUrl"].rstrip("/") + "/v1"
+        return ResolvedEmbeddingConfig(model=model["id"], provider_name="openai", provider_mode="standard",
+            binding="openai", api_key=access["key"], base_url=base, effective_url=base + "/embeddings",
+            dimension=0, send_dimensions=False)
+
     catalog_service = service or get_model_catalog_service()
     loaded = _load_catalog(catalog)
     profile, model = _active_profile_and_model(loaded, catalog_service, "embedding")

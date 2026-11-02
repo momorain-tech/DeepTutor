@@ -116,6 +116,9 @@ def installed(name: str) -> bool:
 
 
 def module_enabled(name: str, *, selected: dict[str, bool] | None = None) -> bool:
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled() and name == "partners":
+        return False
     if name not in manifests():
         raise ValueError(f"Unknown module: {name}")
     if name == "core":

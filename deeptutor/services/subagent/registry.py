@@ -46,14 +46,26 @@ _BACKENDS: dict[str, SubagentBackend] = {
 
 def list_backend_kinds() -> list[str]:
     """Return every connectable local, remote, and Partner backend kind."""
+    from deeptutor.momorain import enabled
+    if enabled():
+        return []
+
     return list(_BACKENDS.keys())
 
 
 def get_backend(kind: str) -> SubagentBackend | None:
+    from deeptutor.momorain import enabled
+    if enabled():
+        return None
+
     return _BACKENDS.get(str(kind or "").strip())
 
 
 def _detectable_backends() -> list[SubagentBackend]:
+    from deeptutor.momorain import enabled
+    if enabled():
+        return []
+
     return [
         backend
         for backend in _BACKENDS.values()

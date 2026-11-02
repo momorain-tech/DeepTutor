@@ -361,10 +361,12 @@ async def lifespan(app: FastAPI):
 
 from deeptutor.services.workspace.activity import WorkspaceActivityMiddleware
 
+from deeptutor.momorain.lease import web_lifespan
+
 app = FastAPI(
     title="DeepTutor API",
     version="1.0.0",
-    lifespan=lifespan,
+    lifespan=web_lifespan(lifespan),
     # Disable automatic trailing slash redirects to prevent protocol downgrade issues
     # when deployed behind HTTPS reverse proxies (e.g., nginx).
     # Without this, FastAPI's 307 redirects may change HTTPS to HTTP.
@@ -545,3 +547,9 @@ if __name__ == "__main__":
     from deeptutor.api.run_server import main as run_server_main
 
     run_server_main()
+
+# 最外层 ASGI 门禁覆盖懒加载路由、文件下载和 WebSocket。
+from deeptutor.momorain import enabled as momorain_enabled
+if momorain_enabled():
+    from deeptutor.momorain.middleware import MomorainMiddleware
+    app.add_middleware(MomorainMiddleware)

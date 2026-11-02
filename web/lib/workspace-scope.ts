@@ -1,3 +1,4 @@
+import { withoutBasePath } from "./base-path";
 import { browserStorage } from '@/shared/storage'
 
 /**
@@ -88,7 +89,7 @@ export async function selectWorkspace(
   // Next owns navigation. The workspace layout resets only scoped runtimes;
   // the document, account settings and loaded assets stay in place.
   const url = new URL(scopedUrl(destination, workspaceId), window.location.origin)
-  navigate?.(`${url.pathname}${url.search}${url.hash}`)
+  navigate?.(`${withoutBasePath(url.pathname)}${url.search}${url.hash}`)
 }
 
 /** Keep live runtimes when staying in one store; reset them before crossing stores. */

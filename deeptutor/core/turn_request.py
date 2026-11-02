@@ -261,6 +261,13 @@ class TurnRequest(BaseModel):
             )
         return result
 
+    @model_validator(mode="after")
+    def _web_only_execution(self):
+        from deeptutor.momorain import enabled
+        if enabled() and (self.answer_by or self.consult_partner_id or self.partner_discussion_group_id):
+            raise ValueError("网页版暂不开放 CLI、子 agent 或机器人代答")
+        return self
+
     def to_payload(self) -> dict[str, Any]:
         """Return an execution payload while preserving omitted-field semantics."""
 

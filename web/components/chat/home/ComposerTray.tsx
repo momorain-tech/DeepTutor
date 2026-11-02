@@ -170,8 +170,8 @@ export function ComposerTray({
       <div id={rowId} className="dt-tray-bar" inert={fold.away}>
         {mode && <ModeMenu {...mode} placement={placement} />}
         {resources && controls?.skills !== false && <SkillsMenu {...resources} placement={placement} />}
-        {resources && controls?.mcp !== false && <ConnectorsMenu {...resources} placement={placement} />}
-        {partners && controls?.partners !== false && <PartnerLinkMenu {...partners} placement={placement} />}
+        {process.env.NEXT_PUBLIC_MOMORAIN_ENABLED !== "true" && resources && controls?.mcp !== false && <ConnectorsMenu {...resources} placement={placement} />}
+        {process.env.NEXT_PUBLIC_MOMORAIN_ENABLED !== "true" && partners && controls?.partners !== false && <PartnerLinkMenu {...partners} placement={placement} />}
         {answer && controls?.preferences !== false && <AnswerModeMenu {...answer} placement={placement} />}
         {end}
       </div>

@@ -113,6 +113,16 @@ class TurnApplicationService:
     async def start_turn(
         self, payload: TurnRequest | dict[str, Any]
     ) -> tuple[dict[str, Any], dict[str, Any]]:
+        from deeptutor.momorain import enabled as momorain_enabled
+        if momorain_enabled():
+            from deeptutor.momorain.access import operation_access, provision
+            if operation_access.get() is None:
+                access = await asyncio.to_thread(provision, require_ready=True)
+                token = operation_access.set(access)
+                try:
+                    return await self.start_turn(payload)
+                finally:
+                    operation_access.reset(token)
         request = (
             payload if isinstance(payload, TurnRequest) else TurnRequest.model_validate(payload)
         )

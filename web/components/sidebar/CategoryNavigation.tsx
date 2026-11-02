@@ -61,6 +61,7 @@ export function useCategoryNavigation() {
   const pathname = usePathname()
   const { learningPolicy } = useAuthStatus()
   const categories = CATEGORIES.filter(item =>
+    (process.env.NEXT_PUBLIC_MOMORAIN_ENABLED !== "true" || item.id !== "partners") &&
     navVisibleUnderPolicy(item.href, learningPolicy?.allowedSurfaces ?? null)
   )
   const [visited, setVisited] = useState<NavigationCategory[]>([])

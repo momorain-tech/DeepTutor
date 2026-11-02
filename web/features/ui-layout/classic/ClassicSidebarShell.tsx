@@ -1,5 +1,7 @@
 "use client";
 
+
+import { withBasePath } from "@/lib/base-path";
 // Classic UI snapshot — web/components/sidebar/SidebarShell.tsx as it ships on
 // dev (frozen at 3cbecb2). Do not evolve this copy; the modern shell lives
 // in components/sidebar/SidebarShell.tsx.
@@ -193,7 +195,7 @@ export function ClassicSidebarShell({
             className="flex items-center justify-center transition-opacity duration-150 group-hover/sb:opacity-0"
           >
             <Image
-              src="/brand/color-logo.png"
+              src={withBasePath("/brand/color-logo.png")}
               alt="DeepTutor"
               width={22}
               height={22}
@@ -257,14 +259,14 @@ export function ClassicSidebarShell({
       <div className="flex h-[52px] shrink-0 items-center justify-between px-4">
         <Link href="/" prefetch={false} className="group flex items-center gap-1.5">
           <Image
-            src="/brand/color-logo.png"
+            src={withBasePath("/brand/color-logo.png")}
             alt="DeepTutor"
             width={22}
             height={22}
             className="h-[22px] w-[22px] transition-transform duration-200 group-hover:scale-105"
           />
           <Image
-            src="/brand/color-word.png"
+            src={withBasePath("/brand/color-word.png")}
             alt="DeepTutor"
             width={1200}
             height={310}

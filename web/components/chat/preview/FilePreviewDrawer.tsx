@@ -1,5 +1,7 @@
 "use client";
 
+
+import { appFetch } from "@/lib/base-path";
 import { readingCollectionRoute } from "@/lib/learning-routes";
 
 import { memo, useCallback, useEffect, useRef, useState } from "react";
@@ -173,7 +175,7 @@ export default function FilePreviewDrawer({
     try {
       const response =
         previewUrl.startsWith("data:") || previewUrl.startsWith("blob:")
-          ? await fetch(previewUrl)
+          ? await appFetch(previewUrl)
           : await apiFetch(previewUrl, { cache: "no-store" });
       if (!response.ok)
         throw new Error(t("The attachment could not be downloaded."));

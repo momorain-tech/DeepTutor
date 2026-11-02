@@ -74,6 +74,10 @@ def _is_openai_compatible(binding: str | None, api_format: str = "auto") -> bool
 def _set_openai_env_vars(
     api_key: str | list[str] | None, base_url: str | None, *, source: str
 ) -> None:
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        return  # 进程环境是共享的，不能把 A 的 key 放进去让 B 读取。
+
     primary_key = primary_api_key(api_key)
     if primary_key:
         os.environ["OPENAI_API_KEY"] = primary_key
@@ -242,6 +246,16 @@ def get_llm_config() -> LLMConfig:
     Raises:
         LLMConfigError: If required configuration is missing
     """
+    from deeptutor.momorain import enabled as momorain_enabled
+    if momorain_enabled():
+        # 上游的进程级缓存不能用于按人计费：每次重新解析，避免 A 的 key 被 B 复用。
+        scoped = _SCOPED_LLM_CONFIG.get()
+        if scoped is not None:
+            from deeptutor.services.config.provider_runtime import resolve_llm_runtime_config
+            from deeptutor.services.model_selection.runtime import llm_config_from_resolved
+            return llm_config_from_resolved(resolve_llm_runtime_config(llm_selection={"profile_id": "momorain", "model_id": scoped.model}))
+        return _get_llm_config_from_resolver()
+
     global _LLM_CONFIG_CACHE
 
     scoped = _SCOPED_LLM_CONFIG.get()

@@ -40,7 +40,9 @@ logger = logging.getLogger(__name__)
 _AUTH_SETTINGS = load_auth_settings()
 _INTEGRATIONS_SETTINGS = load_integrations_settings()
 
-AUTH_ENABLED: bool = bool(_AUTH_SETTINGS["enabled"])
+from deeptutor.momorain import enabled as momorain_enabled
+
+AUTH_ENABLED: bool = momorain_enabled() or bool(_AUTH_SETTINGS["enabled"])
 AUTH_USERNAME: str = str(_AUTH_SETTINGS["username"])
 AUTH_PASSWORD_HASH: str = str(_AUTH_SETTINGS["password_hash"])
 AUTH_SECRET: str = ""
@@ -55,7 +57,7 @@ POCKETBASE_ENABLED: bool = bool(POCKETBASE_BASE_URL) and AUTH_ENABLED
 _ALGORITHM = "HS256"
 
 
-if AUTH_ENABLED and not POCKETBASE_ENABLED and not AUTH_SECRET:
+if AUTH_ENABLED and not momorain_enabled() and not POCKETBASE_ENABLED and not AUTH_SECRET:
     from deeptutor.multi_user.identity import load_or_create_auth_secret
 
     AUTH_SECRET = load_or_create_auth_secret()

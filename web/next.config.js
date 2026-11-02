@@ -91,6 +91,7 @@ const APP_VERSION = (() => {
 })();
 
 const nextConfig = {
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
   // Keep the production build used by `deeptutor start` separate from the
   // `.next` development cache used by the explicit `deeptutor start --dev`.
   // Without separate directories either command can invalidate the other
@@ -106,6 +107,8 @@ const nextConfig = {
   // Expose the build-time version to the browser so the sidebar badge
   // can compare it against GitHub's latest release.
   env: {
+    NEXT_PUBLIC_BASE_PATH: process.env.NEXT_PUBLIC_BASE_PATH || "",
+    NEXT_PUBLIC_MOMORAIN_ENABLED: process.env.NEXT_PUBLIC_MOMORAIN_ENABLED || "false",
     NEXT_PUBLIC_APP_VERSION: APP_VERSION,
     NEXT_PUBLIC_API_BASE,
     NEXT_PUBLIC_AUTH_ENABLED,
@@ -126,6 +129,7 @@ const nextConfig = {
   // create/upload batches use dedicated streaming route handlers instead, so
   // their total size is not coupled to this in-memory clone limit.
   experimental: {
+    cpus: 1,
     proxyClientMaxBodySize: 210 * 1024 * 1024,
     // Agentic reads and full-draft edits routinely exceed Next's 30-second
     // rewrite default; the browser remains responsible for cancelling them.
