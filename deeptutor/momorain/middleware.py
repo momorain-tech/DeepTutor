@@ -21,6 +21,7 @@ DISABLED = (
     "/api/space/mcp",
     "/api/plugins",
     "/api/system/update",
+    "/api/auth/device-login",
     "/api/auth/device",
     "/api/auth/session-handoff",
     "/api/auth/openai-codex",

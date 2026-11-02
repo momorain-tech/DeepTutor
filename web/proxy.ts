@@ -64,6 +64,9 @@ export function proxy(req: NextRequest): NextResponse {
   }
 
   if (MOMORAIN_ENABLED) {
+    if (pathname === "/profile" || pathname.startsWith("/profile/")) {
+      return NextResponse.redirect("https://momorain.com/account");
+    }
     if (/^\/(admin|partners|subagents|plugins|modules)(\/|$)/.test(pathname) ||
         /^\/settings\/(cli|mcp|subagents|partners|providers|models|auth|plugins|modules)(\/|$)/.test(pathname)) {
       return new NextResponse(null, { status: 404 });
