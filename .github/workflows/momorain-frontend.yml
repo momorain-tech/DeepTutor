@@ -1,0 +1,44 @@
+name: momorain 网页构建
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: momorain-frontend-release
+  cancel-in-progress: false
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: 安装前端依赖
+        working-directory: web
+        run: npm ci --legacy-peer-deps
+      - name: 类型与路径测试
+        working-directory: web
+        run: |
+          npm run typecheck
+          npx vitest run tests/momorain-base-path.spec.ts
+      - name: 编译固定子路径网页
+        working-directory: web
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: npm run build
+      - name: 打包 Linux x64 产物
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=$(cat deploy/momorain/frontend-version.txt | tr -d '\n')
+          node -e 'require("fs").writeFileSync("web/.next/standalone/frontend-build.json", JSON.stringify({commit: process.env.GITHUB_SHA, basePath: "/deeptutor", platform: process.platform, arch: process.arch}))'
+          tar -czf frontend-linux-x64.tar.gz -C web/.next/standalone .
+          sha256sum frontend-linux-x64.tar.gz > frontend-linux-x64.tar.gz.sha256
+          gh release create "$TAG" frontend-linux-x64.tar.gz frontend-linux-x64.tar.gz.sha256 --target "$GITHUB_SHA" --title "$TAG" --notes "momorain /deeptutor Linux x64 前端；已通过类型与路径检查。" --latest=false

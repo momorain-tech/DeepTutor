@@ -359,9 +359,8 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Failed to stop EventBus: {e}")
 
 
-from deeptutor.services.workspace.activity import WorkspaceActivityMiddleware
-
 from deeptutor.momorain.lease import web_lifespan
+from deeptutor.services.workspace.activity import WorkspaceActivityMiddleware
 
 app = FastAPI(
     title="DeepTutor API",
@@ -550,6 +549,7 @@ if __name__ == "__main__":
 
 # 最外层 ASGI 门禁覆盖懒加载路由、文件下载和 WebSocket。
 from deeptutor.momorain import enabled as momorain_enabled
+
 if momorain_enabled():
     from deeptutor.momorain.middleware import MomorainMiddleware
     app.add_middleware(MomorainMiddleware)

@@ -1,13 +1,9 @@
-# 网页专用部署：前端、API 和 nginx 在同一容器，数据独立挂卷。
+# 生产机器只组装已编译前端和锁定的 Python 依赖；前端编译在 GitHub Actions 完成。
 FROM node:22-bookworm-slim AS web
-WORKDIR /build/web
-RUN npm config set registry https://registry.npmmirror.com
-COPY web/package.json web/package-lock.json ./
-RUN npm ci --legacy-peer-deps
-COPY web/ ./
-COPY deeptutor/__version__.py /build/deeptutor/__version__.py
-ENV NODE_OPTIONS=--max-old-space-size=1536
-RUN npm run build
+WORKDIR /build
+COPY deploy/momorain/frontend-version.txt deploy/momorain/download-frontend.mjs ./
+RUN node download-frontend.mjs && mkdir /build/web && tar -xzf frontend.tar.gz -C /build/web \
+    && node -e 'const b=require("/build/web/frontend-build.json"); if(b.basePath!=="/deeptutor" || b.platform!=="linux" || b.arch!=="x64") process.exit(1)'
 
 FROM python:3.12-slim-bookworm AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
@@ -18,15 +14,19 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     NEXT_PUBLIC_BASE_PATH=/deeptutor NEXT_PUBLIC_MOMORAIN_ENABLED=true \
     PORT=3001 HOSTNAME=127.0.0.1
 WORKDIR /app
+# BuildKit 默认并行构建无依赖的阶段：先等前端完成，再安装 Python 依赖。
+# 小内存服务器上并行跑 webpack + pip 解析/编译会挤压现有站点。
+COPY --from=web /build/web/frontend-build.json /tmp/deeptutor-frontend-built.json
 RUN sed -i 's|http://deb.debian.org|https://mirrors.tuna.tsinghua.edu.cn|g; s|http://security.debian.org|https://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources \
     && apt-get update && apt-get install -y --no-install-recommends nginx supervisor ca-certificates fonts-noto-cjk libgomp1 curl \
     && rm -rf /var/lib/apt/lists/*
 COPY requirements/ ./requirements/
-RUN pip install --no-cache-dir -r requirements/full.txt
+RUN pip install --no-cache-dir -r requirements/momorain-linux.lock
 COPY --from=web /usr/local/bin/node /usr/local/bin/node
-COPY --from=web /build/web/.next/standalone/ ./web/
-COPY --from=web /build/web/.next/static/ ./web/.next/static/
-COPY --from=web /build/web/public/ ./web/public/
+# Python slim 不保证自带 Node 依赖的 C++ 运行库，单独安装以保留 pip 的构建缓存。
+RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6 libatomic1 \
+    && rm -rf /var/lib/apt/lists/* && node --version
+COPY --from=web /build/web/ ./web/
 COPY deeptutor/ ./deeptutor/
 COPY deeptutor_cli/ ./deeptutor_cli/
 COPY pyproject.toml build_metadata.py build_support.py ./

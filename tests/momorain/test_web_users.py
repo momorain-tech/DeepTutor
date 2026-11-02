@@ -1,12 +1,13 @@
 """验证真实存储和 ASGI 边界：多用户、并发多会话、重启、事件回放及托管扣费身份。"""
+
 from __future__ import annotations
 
 import asyncio
 from pathlib import Path
 
+from fastapi import FastAPI, HTTPException
 import httpx
 import pytest
-from fastapi import FastAPI, HTTPException
 
 from deeptutor.momorain import access
 from deeptutor.momorain.middleware import MomorainMiddleware
@@ -19,6 +20,7 @@ B = "u_" + "b" * 32
 def sandbox(monkeypatch, tmp_path):
     monkeypatch.setenv("MOMORAIN_ENABLED", "true")
     from deeptutor.multi_user import identity, paths
+
     monkeypatch.setattr(identity, "USERS_FILE", tmp_path / "system/auth/users.json")
     monkeypatch.setattr(identity, "LEGACY_USERS_FILE", tmp_path / "missing.json")
     monkeypatch.setattr(paths, "USERS_ROOT", tmp_path / "users")
@@ -35,11 +37,21 @@ def fake_json(url, cookie):
     uid = A if cookie == "alice" else B
     if "session" in url:
         return {"status": "ok", "data": {"userId": uid, "nickname": cookie}}
-    return {"success": True, "data": {"ready": True, "key": "sk-" + cookie,
-        "baseUrl": "https://momorain.com/one-api", "quota": {"display": "¥1.00"},
-        "modelInfos": [{"id": "chat", "capabilities": ["text"]},
-                       {"id": "embed", "capabilities": ["embedding"]},
-                       {"id": "unknown", "capabilities": []}], "topupUrl": "https://momorain.com/account"}}
+    return {
+        "success": True,
+        "data": {
+            "ready": True,
+            "key": "sk-" + cookie,
+            "baseUrl": "https://momorain.com/one-api",
+            "quota": {"display": "¥1.00"},
+            "modelInfos": [
+                {"id": "chat", "capabilities": ["text"]},
+                {"id": "embed", "capabilities": ["embedding"]},
+                {"id": "unknown", "capabilities": []},
+            ],
+            "topupUrl": "https://momorain.com/account",
+        },
+    }
 
 
 def app_with_boundary():
@@ -50,6 +62,7 @@ def app_with_boundary():
     async def probe():
         from deeptutor.multi_user.context import get_current_user
         from deeptutor.services.session import get_session_store
+
         await asyncio.sleep(0)
         return {"uid": get_current_user().id, "path": str(get_session_store().db_path)}
 
@@ -59,17 +72,30 @@ def app_with_boundary():
 @pytest.mark.asyncio
 async def test_http_isolation_and_auth_service_failure(monkeypatch):
     monkeypatch.setattr(access, "_json", fake_json)
-    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app_with_boundary()), base_url="http://testserver") as client:
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app_with_boundary()), base_url="http://testserver"
+    ) as client:
         assert (await client.get("/api/probe")).status_code == 401
-        assert (await client.get("/api/probe", headers={"Cookie": "session=down"})).status_code == 503
-        responses = await asyncio.gather(*[client.get("/api/probe", headers={"Cookie": f"session={who}"}) for who in ["alice", "bob"] * 4])
+        assert (
+            await client.get("/api/probe", headers={"Cookie": "session=down"})
+        ).status_code == 503
+        responses = await asyncio.gather(
+            *[
+                client.get("/api/probe", headers={"Cookie": f"session={who}"})
+                for who in ["alice", "bob"] * 4
+            ]
+        )
         for i, response in enumerate(responses):
             uid = A if i % 2 == 0 else B
             assert response.status_code == 200
             assert response.json()["uid"] == uid
             assert uid in response.json()["path"]
         assert access.identity.get() is None
-        assert (await client.post("/api/probe", headers={"Cookie": "session=alice", "Origin": "https://evil.test"})).status_code == 403
+        assert (
+            await client.post(
+                "/api/probe", headers={"Cookie": "session=alice", "Origin": "https://evil.test"}
+            )
+        ).status_code == 403
         for path in ["/api/subagents", "/api/auth/register", "/api/auth/login", "/api/space/mcp"]:
             assert (await client.get(path)).status_code == 404
         result = await client.get("/api/momorain/access", headers={"Cookie": "session=alice"})
@@ -80,20 +106,28 @@ async def test_http_isolation_and_auth_service_failure(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_multiple_sessions_survive_new_store_and_cannot_cross_owner(tmp_path):
-    from deeptutor.multi_user.context import set_current_user, reset_current_user, user_from_token_payload
+    from deeptutor.multi_user.context import (
+        reset_current_user,
+        set_current_user,
+        user_from_token_payload,
+    )
     from deeptutor.services.auth import TokenPayload
     from deeptutor.services.session import get_session_store
     from deeptutor.services.session.sqlite_store import SQLiteSessionStore
 
     async def write(uid, title):
-        token = set_current_user(user_from_token_payload(TokenPayload(username=uid, user_id=uid, role="user")))
+        token = set_current_user(
+            user_from_token_payload(TokenPayload(username=uid, user_id=uid, role="user"))
+        )
         try:
             store = get_session_store()
             session = await store.create_session(title=title)
             await store.add_message(session["id"], "user", f"{uid}:{title}")
             await store.add_message(session["id"], "assistant", f"回答:{title}")
             turn = await store.create_turn(session["id"], "chat")
-            events = await store.append_events(turn["id"], [{"type": "token", "content": "一"}, {"type": "token", "content": "二"}])
+            events = await store.append_events(
+                turn["id"], [{"type": "token", "content": "一"}, {"type": "token", "content": "二"}]
+            )
             return store.db_path, session["id"], turn["id"], events
         finally:
             reset_current_user(token)
@@ -117,14 +151,20 @@ async def test_multiple_sessions_survive_new_store_and_cannot_cross_owner(tmp_pa
 
 def test_keys_rotate_and_both_model_roles_use_current_owner(monkeypatch):
     calls = []
+
     def rotating(url, cookie):
         calls.append(cookie)
         body = fake_json(url, cookie)
         body["data"]["key"] += f"-{len(calls)}"
         return body
+
     monkeypatch.setattr(access, "_json", rotating)
-    from deeptutor.services.config.provider_runtime import resolve_llm_runtime_config, resolve_embedding_runtime_config
     from deeptutor.services.config.model_catalog import ModelCatalogService
+    from deeptutor.services.config.provider_runtime import (
+        resolve_embedding_runtime_config,
+        resolve_llm_runtime_config,
+    )
+
     for who, uid in [("alice", A), ("bob", B)]:
         token = access.identity.set(access.Identity(uid, who, who))
         try:
@@ -148,11 +188,15 @@ def test_unready_never_calls_model_and_selection_is_enforced(monkeypatch):
         with pytest.raises(HTTPException) as exc:
             access.resolve_model({"profile_id": "momorain", "model_id": "embed"})
         assert exc.value.status_code == 400
-        assert [m["id"] for m in access.models(fake_json("provision", "alice")["data"], "text")] == ["chat", "unknown"]
+        assert [
+            m["id"] for m in access.models(fake_json("provision", "alice")["data"], "text")
+        ] == ["chat", "unknown"]
+
         def empty(url, cookie):
             body = fake_json(url, cookie)
             body["data"].update(ready=False, reason="no_quota")
             return body
+
         monkeypatch.setattr(access, "_json", empty)
         with pytest.raises(HTTPException) as exc:
             access.resolve_model()
@@ -163,6 +207,7 @@ def test_unready_never_calls_model_and_selection_is_enforced(monkeypatch):
 
 def test_second_instance_cannot_recover_live_users(tmp_path):
     from deeptutor.momorain.lease import instance_lease
+
     path = tmp_path / "data/.momorain-web.lock"
     with instance_lease(path):
         with pytest.raises(RuntimeError, match="已有"):

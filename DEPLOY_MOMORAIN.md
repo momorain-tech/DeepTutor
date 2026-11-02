@@ -54,7 +54,11 @@ MOMORAIN_PROVISION_URL=https://momorain.com/one-api/api/momorain/provision
 
 服务器内网可替换后两个 URL，但务必包含对应原始路径。构建期的 `/deeptutor` 前缀和网页模式已入库于 `web/.env.production`，不依赖手填 build args。
 
-容器内 nginx 监听 3000，Next 监听 127.0.0.1:3001，FastAPI 监听 127.0.0.1:8001。nginx 保留页面前缀，只对内部 API / WS 转发剥一次 `/deeptutor`，关闭上传和流式响应缓冲。Dockerfile 使用国内 npm、pip、apt 源；前端使用本机字体，不访问 Google Fonts。
+容器内 nginx 监听 3000，Next 监听 127.0.0.1:3001，FastAPI 监听 127.0.0.1:8001。nginx 保留页面前缀，只对内部 API / WS 转发剥一次 `/deeptutor`，关闭上传和流式响应缓冲。前端在 `.github/workflows/momorain-frontend.yml` 中由 GitHub Actions 进行类型检查、路径测试和构建，再发布 Linux x64 压缩包及 SHA256。服务器 Dockerfile 只下载 `deploy/momorain/frontend-version.txt` 指定的版本并验校验值，完全不在生产机器编译 Next。Python 使用 `requirements/momorain-linux.lock`，不在服务器重复解析整棵依赖图。阶段之间串行，运行内存限制不等于 Docker 构建限制，仍不要同时启动多个首次构建。
+
+每次修改 web，先修改前端版本文件为新值、推送，再运行 `momorain 网页构建` workflow；成功后才在 Dokploy 部署。版本产物不可覆盖，方便回滚到一致的前端。
+
+Dockerfile 使用国内 npm、pip、apt 源；前端使用本机字体，不访问 Google Fonts。
 
 健康检查：API `/health/ready`。未登录请求 `/deeptutor/api/sessions` 应为 401，`/deeptutor/api/auth/status` 应为 enabled=true/authenticated=false。禁止功能应为 404。聊天和知识库操作还需要一个真实已登录且 provision ready 的账号。
 
@@ -75,5 +79,13 @@ python /app/backup.py /backups/deeptutor-20261102
 cd web && npx vitest run tests/momorain-base-path.spec.ts
 npm run build
 ```
+
+完整本机协议验收（先运行本机 API、前端和模拟服务）：
+
+```sh
+.venv-web/bin/python tests/momorain/smoke_check.py
+```
+
+覆盖两个账号、三个并发会话、重复提交去重、历史保存、跨账号 404 和 after_seq 增量回放；模型调用使用本机模拟 key。
 
 `tests/momorain/smoke_server.py` 是仅监听 127.0.0.1 的模拟账号/模型网关，用于全流程检查，不连接真实付费服务、不用于部署。正式镜像不包含 tests 目录。

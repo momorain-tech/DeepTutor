@@ -1,6 +1,7 @@
 """运行中安全备份：SQLite 使用 online backup，不能只拷 db 而漏掉 WAL。"""
-from pathlib import Path
+
 import argparse
+from pathlib import Path
 import shutil
 import sqlite3
 
@@ -19,7 +20,10 @@ def backup(data: Path, destination: Path) -> None:
         with source.open("rb") as stream:
             sqlite = stream.read(16) == b"SQLite format 3\0"
         if sqlite:
-            with sqlite3.connect(f"file:{source}?mode=ro", uri=True) as src, sqlite3.connect(target) as dst:
+            with (
+                sqlite3.connect(f"file:{source}?mode=ro", uri=True) as src,
+                sqlite3.connect(target) as dst,
+            ):
                 src.backup(dst)
         else:
             shutil.copy2(source, target)
