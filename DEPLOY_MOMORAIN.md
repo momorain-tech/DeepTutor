@@ -39,6 +39,7 @@
 | Domain Host / Path | `momorain.com` / `/deeptutor` |
 | HTTPS | 开启，复用 Let's Encrypt |
 | Strip Path | **关闭** |
+| Auto Deploy | **关闭**，先发布前端产物，再手动 Deploy |
 | Replicas | **1** |
 | Update order | **stop-first** |
 | Volume | 命名卷 `deeptutor-data` → `/app/data` |
@@ -89,3 +90,9 @@ npm run build
 覆盖两个账号、三个并发会话、重复提交去重、历史保存、跨账号 404 和 after_seq 增量回放；模型调用使用本机模拟 key。
 
 `tests/momorain/smoke_server.py` 是仅监听 127.0.0.1 的模拟账号/模型网关，用于全流程检查，不连接真实付费服务、不用于部署。正式镜像不包含 tests 目录。
+
+固定依赖更新命令（在开发机执行）：
+
+```sh
+uv pip compile requirements/full.txt --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --index-url https://pypi.tuna.tsinghua.edu.cn/simple -o requirements/momorain-linux.lock
+```
