@@ -114,3 +114,56 @@ def test_ws_requires_command_ids_for_retryable_mutations(protocol_client) -> Non
     assert frame["error_code"] == "invalid_command"
     assert frame["protocol_version"] == "2.0"
     assert turns.cancelled == []
+
+
+def test_ws_start_turn_http_error_is_terminal_and_keeps_socket(protocol_client) -> None:
+    """取模型 key 失败（如 one-api 429）时：回一个终止的拒绝，连接不断开。
+
+    以前异常冒到最外层把 WebSocket 关掉并标成可重试，前端就重连重发同一条消息，
+    形成每秒一两次的重试循环（2026-11-04 线上事故）。
+    """
+    from fastapi import HTTPException
+
+    client, turns = protocol_client
+    attempts: list[dict] = []
+
+    async def start_turn(payload):
+        attempts.append(payload)
+        raise HTTPException(503, "模型服务繁忙，请稍等片刻再试")
+
+    turns.start_turn = start_turn
+    with client.websocket_connect("/ws") as socket:
+        socket.send_json(
+            {
+                "type": "start_turn",
+                "protocol_version": "2.0",
+                "content": "hi",
+                "session_id": "session-1",
+            }
+        )
+        frame = socket.receive_json()
+        # 连接还活着：还能正常 ping。
+        socket.send_json({"type": "ping", "protocol_version": "2.0"})
+        assert socket.receive_json() == {"type": "pong", "protocol_version": "2.0"}
+
+    assert frame["type"] == "protocol_error"
+    assert frame["error_code"] == "start_turn_rejected"
+    assert frame["message"] == "模型服务繁忙，请稍等片刻再试"
+    assert frame["session_id"] == "session-1"
+    assert len(attempts) == 1
+
+
+def test_ws_quota_detail_dict_becomes_message(protocol_client) -> None:
+    from fastapi import HTTPException
+
+    client, turns = protocol_client
+
+    async def start_turn(_payload):
+        raise HTTPException(402, {"message": "模型额度不足，请充值", "reason": "no_quota"})
+
+    turns.start_turn = start_turn
+    with client.websocket_connect("/ws") as socket:
+        socket.send_json({"type": "start_turn", "protocol_version": "2.0", "content": "hi"})
+        frame = socket.receive_json()
+    assert frame["error_code"] == "start_turn_rejected"
+    assert frame["message"] == "模型额度不足，请充值"

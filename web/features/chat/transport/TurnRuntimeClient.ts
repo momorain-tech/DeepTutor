@@ -85,6 +85,24 @@ function prepareCommand(command: ClientCommand): {
   };
 }
 
+/**
+ * 服务端明确拒绝「开回合」时用的错误码。收到它说明这条消息不会被受理，
+ * 留在 pending 里只会在下次重连时被原样重发——2026-11-04 线上就是这样，
+ * 一条发不出去的消息 7 分钟内被重发了 430 次。
+ */
+const ADMISSION_REJECTED_CODES = new Set([
+  "start_turn_rejected",
+  "regenerate_rejected",
+]);
+const ADMISSION_COMMAND_TYPES = new Set(["start_turn", "message", "regenerate"]);
+
+/**
+ * 连接要稳定保持这么久，才把重连退避计数清零。
+ * 以前一连上就清零：服务端如果「一连上就出错断开」，退避永远停在第一档 250ms，
+ * 变成每秒重连好几次。
+ */
+const STABLE_CONNECTION_MS = 10_000;
+
 const defaultScheduler: RuntimeScheduler = {
   setTimeout: (callback, delay) => globalThis.setTimeout(callback, delay),
   clearTimeout: (handle) =>
@@ -118,6 +136,7 @@ export class TurnRuntimeClient {
   private reconnectHandle: unknown = null;
   private replayProbeHandle: unknown = null;
   private reconnectAttempt = 0;
+  private openedAt: number | null = null;
   private generation = 0;
   private stopped = false;
   private pageVisible = true;
@@ -295,7 +314,8 @@ export class TurnRuntimeClient {
   private handleOpen(socket: TurnSocket): void {
     if (socket !== this.socket || this.stopped) return;
     this.generation += 1;
-    this.reconnectAttempt = 0;
+    // 退避计数在 handleClose 里按连接存活时长决定是否清零，见 STABLE_CONNECTION_MS。
+    this.openedAt = Date.now();
     this.setState("connected");
     if (this.turnId) {
       this.sendNow(
@@ -335,6 +355,8 @@ export class TurnRuntimeClient {
       this.options.onDiagnostic?.(
         `turn protocol error; code=${event.error_code}; retryable=${String(event.retryable)}`,
       );
+      if (ADMISSION_REJECTED_CODES.has(event.error_code))
+        this.dropRejectedAdmission(event.session_id || "");
       this.options.onEvent(event);
       return;
     }
@@ -401,9 +423,28 @@ export class TurnRuntimeClient {
     if (!this.terminalObserved) this.scheduleReplayProbe();
   }
 
+  /** 服务端拒绝了开回合：把对应的待发命令删掉，别在重连后再发一遍。 */
+  private dropRejectedAdmission(sessionId: string): void {
+    this.pending = this.pending.filter((item) => {
+      if (item.requiresAck) return true;
+      const record = item.command as unknown as Record<string, unknown>;
+      if (!ADMISSION_COMMAND_TYPES.has(String(record.type))) return true;
+      const commandSession =
+        typeof record.session_id === "string" ? record.session_id : "";
+      // 新会话的第一条消息没有 session_id，服务端回的错误里也是空的。
+      return Boolean(sessionId) && commandSession !== sessionId;
+    });
+  }
+
   private handleClose(socket: TurnSocket): void {
     if (socket !== this.socket) return;
     this.socket = null;
+    if (
+      this.openedAt !== null &&
+      Date.now() - this.openedAt >= STABLE_CONNECTION_MS
+    )
+      this.reconnectAttempt = 0;
+    this.openedAt = null;
     this.clearReplayProbe();
     if (this.stopped) return;
     this.setState(this.turnId ? "recovering" : "connecting");

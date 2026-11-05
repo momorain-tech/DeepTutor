@@ -434,3 +434,65 @@ test("acknowledged commands get a generated command_id when crypto.randomUUID is
     if (cryptoObject) cryptoObject.randomUUID = original;
   }
 });
+
+test("a rejected start_turn is not resent after the socket reconnects", () => {
+  // 2026-11-04 线上：服务端拒绝开回合后，同一条消息每次重连都被重发，7 分钟 430 次。
+  const { client, scheduler, sockets } = harness();
+  client.connect();
+  sockets[0].open();
+  client.send({
+    type: "start_turn",
+    protocol_version: "2.0",
+    content: "hi",
+    session_id: "session-1",
+  } as never);
+  assert.equal(sockets[0].sent.filter((c) => c.type === "start_turn").length, 1);
+
+  sockets[0].message({
+    type: "protocol_error",
+    error_code: "start_turn_rejected",
+    message: "模型服务繁忙，请稍等片刻再试",
+    retryable: true,
+    session_id: "session-1",
+    turn_id: "",
+    protocol_version: "2.0",
+  });
+  sockets[0].close();
+  scheduler.runNext();
+  sockets[1].open();
+  assert.equal(sockets[1].sent.filter((c) => c.type === "start_turn").length, 0);
+});
+
+test("a socket that drops right after opening keeps backing off", () => {
+  const delays: number[] = [];
+  const sockets: FakeSocket[] = [];
+  const tasks: Array<() => void> = [];
+  const client = new TurnRuntimeClient({
+    socketFactory: () => {
+      const socket = new FakeSocket();
+      sockets.push(socket);
+      return socket;
+    },
+    scheduler: {
+      setTimeout(callback, delay) {
+        delays.push(delay);
+        tasks.push(callback);
+        return callback;
+      },
+      clearTimeout() {},
+    },
+    random: () => 0.5,
+    onEvent: () => {},
+  });
+  client.setResumeCursor("turn-1", 0); // 有进行中的回合才会无限重连
+  client.connect();
+  for (let i = 0; i < 4; i += 1) {
+    sockets[i].open();
+    sockets[i].close();
+    tasks.shift()?.();
+  }
+  // 一连上就断：退避不能每次都回到第一档。
+  const reconnects = delays.filter((d) => d !== 5_000);
+  assert.deepEqual(reconnects, [250, 500, 1000, 2000]);
+  client.stop();
+});

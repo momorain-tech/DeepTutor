@@ -27,6 +27,10 @@ def sandbox(monkeypatch, tmp_path):
     monkeypatch.setattr(paths, "SYSTEM_ROOT", tmp_path / "system")
     monkeypatch.setattr(paths, "_legacy_migration_done", True)
     monkeypatch.setattr(paths, "_path_services", {})
+    # provision 有进程内缓存，每个测试从空缓存开始，免得上一个测试的假 key 串进来。
+    access.clear_cache()
+    yield
+    access.clear_cache()
 
 
 def fake_json(url, cookie):
@@ -172,7 +176,11 @@ def test_keys_rotate_and_both_model_roles_use_current_owner(monkeypatch):
             embed = resolve_embedding_runtime_config({})
             again = resolve_llm_runtime_config({})
             assert who in chat.api_key and who in embed.api_key
-            assert chat.api_key != again.api_key
+            # 缓存期内同一用户复用同一把 key，不再每次都去打 one-api。
+            assert chat.api_key == again.api_key
+            access.clear_cache()
+            rotated = resolve_llm_runtime_config({})
+            assert who in rotated.api_key and rotated.api_key != chat.api_key
             assert embed.model == "embed"
             assert "sk-" not in str(ModelCatalogService().load())
             with pytest.raises(PermissionError):
@@ -198,6 +206,7 @@ def test_unready_never_calls_model_and_selection_is_enforced(monkeypatch):
             return body
 
         monkeypatch.setattr(access, "_json", empty)
+        access.clear_cache()  # 模拟缓存过期后上游变成额度不足
         with pytest.raises(HTTPException) as exc:
             access.resolve_model()
         assert exc.value.status_code == 402
@@ -215,3 +224,83 @@ def test_second_instance_cannot_recover_live_users(tmp_path):
                 pass
     with instance_lease(path):
         pass  # 首个实例退出后，下一次重启能正常取得锁。
+
+
+class Clock:
+    def __init__(self):
+        self.t = 1000.0
+
+    def __call__(self):
+        return self.t
+
+
+def test_provision_cache_is_per_user_and_expires(monkeypatch):
+    calls = []
+
+    def counting(url, cookie):
+        calls.append(cookie)
+        return fake_json(url, cookie)
+
+    clock = Clock()
+    monkeypatch.setattr(access, "_json", counting)
+    monkeypatch.setattr(access, "_now", clock)
+    for who, uid in [("alice", A), ("bob", B), ("alice", A), ("bob", B)]:
+        token = access.identity.set(access.Identity(uid, who, who))
+        try:
+            assert access.provision()["key"] == "sk-" + who
+        finally:
+            access.identity.reset(token)
+    # 两个用户各取一次；第二轮命中各自的缓存，没有串号。
+    assert calls == ["alice", "bob"]
+
+    clock.t += access.CACHE_TTL + 1
+    token = access.identity.set(access.Identity(A, "alice", "alice"))
+    try:
+        access.provision()
+    finally:
+        access.identity.reset(token)
+    assert calls == ["alice", "bob", "alice"]
+
+
+def test_provision_rate_limited_falls_back_to_recent_cache(monkeypatch):
+    clock = Clock()
+    monkeypatch.setattr(access, "_now", clock)
+    monkeypatch.setattr(access, "_json", fake_json)
+    token = access.identity.set(access.Identity(A, "alice", "alice"))
+    try:
+        assert access.provision(require_ready=True)["key"] == "sk-alice"
+
+        def limited(url, cookie):
+            raise HTTPException(503, "模型服务繁忙，请稍等片刻再试")
+
+        monkeypatch.setattr(access, "_json", limited)
+        clock.t += access.CACHE_TTL + 1  # 缓存过期，但还在宽限期内
+        assert access.provision(require_ready=True)["key"] == "sk-alice"
+
+        clock.t += access.STALE_GRACE  # 超出宽限期：如实报错
+        with pytest.raises(HTTPException) as exc:
+            access.provision(require_ready=True)
+        assert exc.value.status_code == 503
+    finally:
+        access.identity.reset(token)
+
+
+def test_provision_logout_drops_cache(monkeypatch):
+    clock = Clock()
+    monkeypatch.setattr(access, "_now", clock)
+    monkeypatch.setattr(access, "_json", fake_json)
+    token = access.identity.set(access.Identity(A, "alice", "alice"))
+    try:
+        access.provision()
+    finally:
+        access.identity.reset(token)
+    clock.t += access.CACHE_TTL + 1
+    # 同一用户、Cookie 已失效：401 不能被旧缓存兜住。
+    token = access.identity.set(access.Identity(A, "alice", "expired"))
+    try:
+        with pytest.raises(HTTPException) as exc:
+            access.provision()
+        assert exc.value.status_code == 401
+    finally:
+        access.identity.reset(token)
+    assert A not in access._cache

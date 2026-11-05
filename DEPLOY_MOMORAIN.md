@@ -7,7 +7,8 @@
 - `MOMORAIN_ENABLED=true` 开启网页模式。所有 API、文件下载和 WebSocket 在 ASGI 边界检查 momorain `session` Cookie；通过 `/api/auth/session` 查身份，不持有 JWT 签名密钥。
 - 浏览器访问站点根 `/api/auth/session` 续期；登录跳到 `https://momorain.com/login?next=...`，昵称链到全站 `/account`。
 - 后端转发当前用户 Cookie 获取 one-api provision。模型选择只存 `{profile_id: "momorain", model_id: ...}`；模型 key 不写入数据库、目录、会话、环境变量或前端。
-- 每个新回合在线程取一次 provision，后台回合只继承自己的操作上下文。不会跨回合、跨用户复用凭证；模型列表等读取只返回去除 key 的元数据。
+- 每个新回合在线程取一次 provision，后台回合只继承自己的操作上下文。provision 结果按 userId 在**进程内存**缓存（ready 60 秒、未就绪 10 秒，`MOMORAIN_PROVISION_CACHE_SECONDS` 可调），绝不跨用户复用、不落盘；上游 401 立即删缓存，429/5xx 时 5 分钟内退回旧的 ready 结果。原因：one-api 的 provision 按来源 IP 限流（60 次/20 分钟），DeepTutor 服务端代调时所有用户共用服务器 IP 这一个桶，不缓存会被页面上的模型列表、工具状态等读取打满（2026-11-04 事故）。模型列表等读取只返回去除 key 的元数据。
+- 开回合被拒（取 key 失败、额度不足等）时，WebSocket 回 `start_turn_rejected` 并保持连接；前端收到后丢弃这条待发消息、不在重连后重发，重连退避在连接稳定 10 秒后才清零。
 - 对话与后台任务模型走用户 key 的 `/v1/chat/completions`；知识库向量走同一用户 key 的 `/v1/embeddings`。按 `ready` 阻止未就绪的付费动作，额度不足返回 402，账号服务不可用返回 503。
 - one-api 必须先配置已开通、有输入定价并标记 `embedding` 的向量模型。通义等使用 OpenAI 兼容渠道，避免原生适配丢掉 dimensions。没有模型时不会借用运营者的 key。
 
