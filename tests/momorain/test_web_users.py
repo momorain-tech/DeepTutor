@@ -304,3 +304,93 @@ def test_provision_logout_drops_cache(monkeypatch):
     finally:
         access.identity.reset(token)
     assert A not in access._cache
+
+
+def test_provision_429_cooldown_stops_hitting_upstream(monkeypatch):
+    """审查发现：缓存过期后被 429，连续 20 次读取会打 20 次上游。冷却期内应当一次都不打。"""
+    clock = Clock()
+    monkeypatch.setattr(access, "_now", clock)
+    calls = []
+
+    def limited(url, cookie):
+        calls.append(cookie)
+        raise access.UpstreamRateLimited()
+
+    monkeypatch.setattr(access, "_json", limited)
+    token = access.identity.set(access.Identity(A, "alice", "alice"))
+    try:
+        for _ in range(20):
+            with pytest.raises(HTTPException) as exc:
+                access.provision()
+            assert exc.value.status_code == 503
+        assert len(calls) == 1
+
+        # 冷却按次翻倍：30 秒后再试一次，又被 429 → 这次冷却 60 秒。
+        clock.t += access.RATE_LIMIT_COOLDOWN + 1
+        with pytest.raises(HTTPException):
+            access.provision()
+        assert len(calls) == 2
+        clock.t += access.RATE_LIMIT_COOLDOWN + 1  # 只过了 31 秒，仍在 60 秒冷却里
+        with pytest.raises(HTTPException):
+            access.provision()
+        assert len(calls) == 2
+        clock.t += access.RATE_LIMIT_COOLDOWN
+        with pytest.raises(HTTPException):
+            access.provision()
+        assert len(calls) == 3
+
+        # 上游恢复：冷却结束后一次成功即清零。
+        monkeypatch.setattr(access, "_json", fake_json)
+        clock.t += access.RATE_LIMIT_COOLDOWN_MAX
+        assert access.provision()["key"] == "sk-alice"
+        assert A not in access._cooldowns
+    finally:
+        access.identity.reset(token)
+
+
+def test_provision_cooldown_serves_stale_and_respects_retry_after(monkeypatch):
+    clock = Clock()
+    monkeypatch.setattr(access, "_now", clock)
+    monkeypatch.setattr(access, "_json", fake_json)
+    token = access.identity.set(access.Identity(A, "alice", "alice"))
+    try:
+        access.provision()
+        calls = []
+
+        def limited(url, cookie):
+            calls.append(cookie)
+            raise access.UpstreamRateLimited(retry_after=300)
+
+        monkeypatch.setattr(access, "_json", limited)
+        clock.t += access.CACHE_TTL + 1
+        for _ in range(20):
+            assert access.provision(require_ready=True)["key"] == "sk-alice"
+        assert len(calls) == 1
+        clock.t += 200  # Retry-After=300 秒还没到
+        access.provision()
+        assert len(calls) == 1
+    finally:
+        access.identity.reset(token)
+
+
+def test_cooldown_is_per_user(monkeypatch):
+    clock = Clock()
+    monkeypatch.setattr(access, "_now", clock)
+
+    def alice_limited(url, cookie):
+        if cookie == "alice":
+            raise access.UpstreamRateLimited()
+        return fake_json(url, cookie)
+
+    monkeypatch.setattr(access, "_json", alice_limited)
+    token = access.identity.set(access.Identity(A, "alice", "alice"))
+    try:
+        with pytest.raises(HTTPException):
+            access.provision()
+    finally:
+        access.identity.reset(token)
+    token = access.identity.set(access.Identity(B, "bob", "bob"))
+    try:
+        assert access.provision()["key"] == "sk-bob"
+    finally:
+        access.identity.reset(token)
