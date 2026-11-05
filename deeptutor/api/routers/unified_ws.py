@@ -12,7 +12,7 @@ import json
 import logging
 from typing import Any
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import TypeAdapter, ValidationError
 
 from deeptutor.api.contracts.turn_protocol import (
@@ -25,6 +25,14 @@ from deeptutor.services.workspace.models import WorkspaceError
 router = APIRouter()
 logger = logging.getLogger(__name__)
 _CLIENT_COMMAND_ADAPTER = TypeAdapter(ClientCommand)
+
+
+def _http_error_text(exc: HTTPException) -> str:
+    """把 HTTPException 的 detail（可能是字符串或 {message: ...}）变成给用户看的一句话。"""
+    detail = exc.detail
+    if isinstance(detail, dict):
+        return str(detail.get("message") or "请求被拒绝")
+    return str(detail or "请求被拒绝")
 
 
 def _clean_answers(value: Any) -> list[dict[str, Any]] | None:
@@ -226,6 +234,19 @@ async def unified_websocket(ws: WebSocket) -> None:
                             if key not in {"type", "protocol_version"}
                         }
                     )
+                except HTTPException as exc:
+                    # 开回合前要先取模型 key（provision），它失败时抛的是 HTTPException
+                    # （429 限流 / 503 / 402 额度不足）。以前这里没接住，异常一路冒到最外层，
+                    # 把整条 WebSocket 关掉并标成「可重试」，前端就重连、重发同一条消息，
+                    # 每秒一两次停不下来（2026-11-04 线上 7 分钟重发了 430 次）。
+                    # 现在当成一次被拒绝的回合处理：告诉前端失败了，连接保持不断。
+                    await send_error(
+                        _http_error_text(exc),
+                        error_code="start_turn_rejected",
+                        session_id=str(msg.get("session_id") or ""),
+                        terminal=True,
+                    )
+                    continue
                 except (RuntimeError, WorkspaceError) as exc:
                     await send_error(
                         str(exc),
@@ -333,6 +354,19 @@ async def unified_websocket(ws: WebSocket) -> None:
                 overrides = msg.get("overrides") if isinstance(msg.get("overrides"), dict) else None
                 try:
                     _, turn = await turns.regenerate_last_turn(session_id, overrides=overrides)
+                except HTTPException as exc:
+                    # 开回合前要先取模型 key（provision），它失败时抛的是 HTTPException
+                    # （429 限流 / 503 / 402 额度不足）。以前这里没接住，异常一路冒到最外层，
+                    # 把整条 WebSocket 关掉并标成「可重试」，前端就重连、重发同一条消息，
+                    # 每秒一两次停不下来（2026-11-04 线上 7 分钟重发了 430 次）。
+                    # 现在当成一次被拒绝的回合处理：告诉前端失败了，连接保持不断。
+                    await send_error(
+                        _http_error_text(exc),
+                        error_code="regenerate_rejected",
+                        session_id=session_id,
+                        terminal=True,
+                    )
+                    continue
                 except (RuntimeError, WorkspaceError) as exc:
                     await send_error(
                         str(exc),
