@@ -1,4 +1,5 @@
 import { Database } from "lucide-react";
+import { withBasePath } from "@/lib/base-path";
 
 /**
  * Brand marks for knowledge engines and live knowledge sources.
@@ -6,6 +7,9 @@ import { Database } from "lucide-react";
  * Assets are vendored under /public so the Knowledge Center keeps working in
  * offline/self-hosted deployments. LightRAG deliberately uses the HKUDS
  * organization avatar for both its embedded and server variants.
+ *
+ * 普通 <img> 不会自动加子路径前缀（只有 next/image、Link 会），
+ * 部署在 /deeptutor 下时必须用 withBasePath 包一层，否则请求打到站点根、图标变成坏图。
  */
 const KNOWLEDGE_ICONS: Record<string, string> = {
   llamaindex: "/knowledge-engine-icons/llamaindex.png",
@@ -51,7 +55,7 @@ export default function KnowledgeEngineIcon({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={source}
+      src={withBasePath(source)}
       alt=""
       aria-hidden
       width={size}
