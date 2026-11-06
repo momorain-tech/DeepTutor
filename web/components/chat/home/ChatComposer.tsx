@@ -13,8 +13,17 @@ import {
 import {
   saveWorkspaceDraft,
   readWorkspaceDraft,
+  saveLoginHandoffDraft,
+  takeLoginHandoffDraft,
   type WorkspaceDraft,
 } from "@/lib/workspace-drafts";
+import {
+  BEFORE_LOGIN_EVENT,
+  MOMORAIN_ENABLED,
+  currentPrincipal,
+  requestLogin,
+  resolvePrincipal,
+} from "@/lib/momorain-guest";
 import {
   ArrowUp,
   BookMarked,
@@ -518,6 +527,13 @@ export default memo(function ChatComposer({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const draftAttachmentsRef = useRef(attachments);
   const addDraftFilesRef = useRef(onAddFiles);
+  // 登录暂存草稿时要用到当前对话模式；放进 ref，免得上面只注册一次的监听器拿到旧值。
+  const activeCapRef = useRef<string | null>(activeCap.value || null);
+  const onSelectCapabilityRef = useRef(onSelectCapability);
+  useEffect(() => {
+    activeCapRef.current = activeCap.value || null;
+    onSelectCapabilityRef.current = onSelectCapability;
+  }, [activeCap.value, onSelectCapability]);
   useEffect(() => {
     draftAttachmentsRef.current = attachments;
   }, [attachments]);
@@ -599,9 +615,49 @@ export default memo(function ChatComposer({
       );
     };
     window.addEventListener("deeptutor:before-workspace-switch", save);
+    // momorain：去登录页之前把输入框内容（连同附件和对话模式）暂存起来，
+    // 登录回来由下面那个 effect 填回去。见 lib/workspace-drafts.ts 末尾的说明。
+    const stashForLogin = (event: Event) => {
+      (event as CustomEvent<Promise<void>[]>).detail.push(
+        saveLoginHandoffDraft({ ...collectDraft(), capability: activeCapRef.current }),
+      );
+    };
+    window.addEventListener(BEFORE_LOGIN_EVENT, stashForLogin);
     return () => {
       alive = false;
       window.removeEventListener("deeptutor:before-workspace-switch", save);
+      window.removeEventListener(BEFORE_LOGIN_EVENT, stashForLogin);
+    };
+  }, []);
+  // 登录回来：取回登录前暂存的草稿，只填回输入框，绝不自动发送（发送要花钱，
+  // 而且用户可能已经换了主意）——等用户确认后自己再点一次。
+  useEffect(() => {
+    if (!MOMORAIN_ENABLED) return;
+    let alive = true;
+    void resolvePrincipal()
+      .then((who) => (who === "user" ? takeLoginHandoffDraft() : undefined))
+      .then((draft) => {
+        if (!alive || !draft) return;
+        const current = inputHandleRef.current?.getValue() || "";
+        inputHandleRef.current?.setValue(current ? `${draft.text}\n${current}` : draft.text);
+        setHasContent(Boolean(draft.text.trim() || current.trim()));
+        const files = draft.attachments
+          .filter((item) => item.base64)
+          .map((item) => new File(
+            [Uint8Array.from(atob(item.base64!), (char) => char.charCodeAt(0))],
+            item.filename,
+            { type: item.mimeType || "application/octet-stream" },
+          ));
+        if (files.length) addDraftFilesRef.current(files);
+        if (draft.capability && draft.capability !== activeCapRef.current) {
+          onSelectCapabilityRef.current(draft.capability);
+        }
+      })
+      .catch(() => {
+        /* 取不回草稿不影响使用 */
+      });
+    return () => {
+      alive = false;
     };
   }, []);
   if (lastCapMenuOpen !== capMenuOpen) {
@@ -705,6 +761,17 @@ export default memo(function ChatComposer({
       if (isStreaming && !awaitingUserReply) return false;
       if (capabilityNeedsConfig && !capabilityConfigConfirmed) {
         onRequestConfigConfirm();
+        return false;
+      }
+      // momorain：发送就是调用大模型，必须先登录。没登录时什么都不发，内容留在输入框里，
+      // 弹框说明为什么要登录；用户点「去登录」时草稿会先被暂存（见上面的 stashForLogin）。
+      if (MOMORAIN_ENABLED && currentPrincipal() !== "user") {
+        if (currentPrincipal() === "guest") {
+          requestLogin({ kind: "action", message: "发送消息会调用大模型、保存对话，需要先登录 momorain 账号。" });
+        } else {
+          // 还没确认登录状态（页面刚打开的一瞬间）：先去问，问完用户再点一次即可。
+          void resolvePrincipal();
+        }
         return false;
       }
       onSend(content);

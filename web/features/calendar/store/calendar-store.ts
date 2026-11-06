@@ -1,5 +1,7 @@
 'use client'
 
+// EventSource 不走 apiFetch，得自己补 /deeptutor 前缀；以前漏了，线上一直 404、退回定时轮询。
+import { withBasePath } from '@/lib/base-path'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import {
   calendarStreamUrl,
@@ -81,7 +83,7 @@ export function startCalendarSync(): () => void {
   if (++owners === 1) {
     const source =
       typeof EventSource !== 'undefined'
-        ? new EventSource(calendarStreamUrl(), { withCredentials: true })
+        ? new EventSource(withBasePath(calendarStreamUrl()), { withCredentials: true })
         : null
     let fallback: ReturnType<typeof setInterval> | undefined
     const poll = () => {

@@ -84,7 +84,7 @@ export default function AppShell({ sidebar, pageBar, children, homeHref = "/" }:
     <SidebarDrawerContext.Provider value={{ close }}>
       {/* dvh, not vh: iOS Safari's 100vh includes the retracted address bar, so
           a vh-sized shell pushes the composer under it. */}
-      <div className="flex h-dvh overflow-hidden">
+      <div className="flex h-[var(--app-viewport-h)] overflow-hidden">
         {drawerOpen ? (
           <div
             onClick={close}

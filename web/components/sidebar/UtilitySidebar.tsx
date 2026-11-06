@@ -1,5 +1,6 @@
 "use client";
 
+import { isLoginRequired } from "@/lib/momorain-guest";
 import { activeWorkspaceId, navigateTask } from "@/lib/workspace-scope";
 import { sessionWorkspaceId } from "@/lib/session-api";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -58,7 +59,8 @@ export default function UtilitySidebar() {
       setReadingCollections(nextCollections);
       hasLoadedSessionsRef.current = true;
     } catch (error) {
-      console.error("Failed to load sessions", error);
+      // 访客没登录读不到历史，是预期情况，不算错误。
+      if (!isLoginRequired(error)) console.error("Failed to load sessions", error);
     } finally {
       setLoadingSessions(false);
     }

@@ -37,7 +37,8 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className="momorain-fonts"
+      // momorain-has-nav：页面顶上有账号栏，外壳高度要扣掉它（见 globals.css 末尾）。
+      className={process.env.NEXT_PUBLIC_MOMORAIN_ENABLED === "true" ? "momorain-fonts momorain-has-nav" : "momorain-fonts"}
     >
       <head>
         <ThemeScript />

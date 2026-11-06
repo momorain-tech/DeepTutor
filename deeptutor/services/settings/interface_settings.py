@@ -17,15 +17,20 @@ from typing import Any, Literal
 
 from deeptutor.response_languages import SUPPORTED_RESPONSE_LANGUAGES
 from deeptutor.services.path_service import get_path_service
+from deeptutor.momorain import enabled as momorain_enabled
 from deeptutor.tools.builtin import USER_TOGGLEABLE_TOOL_NAMES
 
 UiLanguage = Literal["en", "zh", "fr", "de", "uk", "pl"]
 
+# momorain 部署面向中文用户：没保存过语言的新用户默认中文（界面 + 模型回复）。
+# 已保存过语言的用户以 interface.json 为准，不受影响。上游默认仍是英文。
+_DEFAULT_LANGUAGE = "zh" if momorain_enabled() else "en"
+
 DEFAULT_UI_SETTINGS: dict[str, Any] = {
     # "snow" is the pure-white neutral theme, shown as "Default" in the UI.
     "theme": "snow",
-    "language": "en",
-    "response_language": "en",
+    "language": _DEFAULT_LANGUAGE,
+    "response_language": _DEFAULT_LANGUAGE,
     # When true, TTS verbalizes LaTeX (fractions, powers, Greek). Dollar
     # delimiters are stripped either way so the voice never says "dollar".
     "voice_math_speak": True,

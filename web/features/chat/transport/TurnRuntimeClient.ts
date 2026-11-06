@@ -3,6 +3,7 @@ import type {
   ServerEvent,
   StreamEvent,
 } from "@/contracts/generated/turn-protocol";
+import { MOMORAIN_ENABLED, currentPrincipal, noteSessionExpired, resolvePrincipal } from "@/lib/momorain-guest";
 import {
   buildPing,
   buildResumeTurn,
@@ -169,6 +170,14 @@ export class TurnRuntimeClient {
   }
 
   connect(): void {
+    if (MOMORAIN_ENABLED && currentPrincipal() !== "user") {
+      if (currentPrincipal() === "unknown") {
+        void resolvePrincipal().then((who) => {
+          if (who === "user" && !this.stopped && !this.socket) this.connect();
+        });
+      }
+      return;
+    }
     if (this.stopped) this.stopped = false;
     if (this.socket && this.socket.readyState <= SOCKET_OPEN) return;
     this.clearReconnect();
@@ -180,7 +189,7 @@ export class TurnRuntimeClient {
     socket.addEventListener("message", (event) =>
       this.handleMessage(socket, event.data),
     );
-    socket.addEventListener("close", () => this.handleClose(socket));
+    socket.addEventListener("close", (event) => this.handleClose(socket, event?.code));
     socket.addEventListener("error", () => {
       if (socket === this.socket)
         this.options.onDiagnostic?.("turn socket error; awaiting close");
@@ -436,9 +445,17 @@ export class TurnRuntimeClient {
     });
   }
 
-  private handleClose(socket: TurnSocket): void {
+  private handleClose(socket: TurnSocket, code?: number): void {
     if (socket !== this.socket) return;
     this.socket = null;
+    // momorain：4401 = 后端认为没登录（多半是登录过期）。重连多少次结果都一样，
+    // 而且每次重连都要去账号服务核验一次，所以停在这里，提示用户重新登录。
+    if (code === 4401 && MOMORAIN_ENABLED) {
+      this.openedAt = null;
+      noteSessionExpired();
+      this.stop();
+      return;
+    }
     if (
       this.openedAt !== null &&
       Date.now() - this.openedAt >= STABLE_CONNECTION_MS
@@ -448,6 +465,17 @@ export class TurnRuntimeClient {
     this.clearReplayProbe();
     if (this.stopped) return;
     this.setState(this.turnId ? "recovering" : "connecting");
+    // 握手接受前拒绝认证时，浏览器只能看到 1006，而不是后端的 4401。
+    // 必须在线复查身份；真正的网络故障仍按原退避策略恢复，不误报登录失效。
+    if (MOMORAIN_ENABLED && code === 1006) {
+      const generation = this.generation;
+      void resolvePrincipal(true).then((who) => {
+        if (this.stopped || this.socket || generation !== this.generation) return;
+        if (who === "guest") this.stop();
+        else this.scheduleReconnect();
+      });
+      return;
+    }
     this.scheduleReconnect();
   }
 

@@ -5,6 +5,9 @@
 ## 接入与费用
 
 - `MOMORAIN_ENABLED=true` 开启网页模式。所有 API、文件下载和 WebSocket 在 ASGI 边界检查 momorain `session` Cookie；通过 `/api/auth/session` 查身份，不持有 JWT 签名密钥。
+- **先浏览，保存或调用模型时再登录**（2026-11-06 起）。未登录访客只能读 `deeptutor/momorain/guest.py` 里 `GUEST_ROUTES` 白名单的公共只读接口（登录状态、模块/能力说明、界面与页面定制的出厂默认值），这些由 guest.py 单独作答，**不进原路由**——上游 `get_current_user()` 缺身份会回退到本地管理员。其余一律 401：私人数据读取、所有写入和上传、WebSocket、模型调用。访客不建用户目录、不取 provision。登录服务故障（503）不当作访客处理。不能简单放行所有 GET：有的 GET 读私人数据，有的会取 provision。
+- 前端 `web/lib/momorain-guest.ts` 有同一张白名单（`GUEST_PATHS`），两边一起改。`apiFetch` 在 momorain 模式下：访客对非白名单接口**不发请求**、本地回 401（读操作静默，写操作弹「需要登录」说明框）；已登录用户收到真实 401 视为登录过期，只弹一次「重新登录」框，不再整页跳转。访客不启动任务板同步、不建聊天 WebSocket；点发送时拦下，内容留在输入框。
+- 去登录前，输入框把草稿（文字、附件、对话模式）暂存到本机 IndexedDB，登录回到同一页面后填回输入框、**不自动发送**（避免登录回来自动扣费或重复提交），30 分钟过期。服务端仍独立把关：路由层 `require_auth`、回合入口 `start_turn` 的 provision、WebSocket 鉴权都各自检查身份。
 - 浏览器访问站点根 `/api/auth/session` 续期；登录跳到 `https://momorain.com/login?next=...`，昵称链到全站 `/account`。
 - 后端转发当前用户 Cookie 获取 one-api provision。模型选择只存 `{profile_id: "momorain", model_id: ...}`；模型 key 不写入数据库、目录、会话、环境变量或前端。
 - 每个新回合在线程取一次 provision，后台回合只继承自己的操作上下文。provision 结果按 userId 在**进程内存**缓存（ready 60 秒、未就绪 10 秒，`MOMORAIN_PROVISION_CACHE_SECONDS` 可调），绝不跨用户复用、不落盘；上游 401 立即删缓存；上游 429 后该用户进入冷却（30 秒起、连续 429 翻倍、封顶 10 分钟，尊重 Retry-After），冷却期内不请求上游，5xx/超时冷却 5 秒；期间 30 分钟内的 ready 旧结果可临时顶用。one-api 侧已改为按用户限流（见 PLATFORM.md），两边需一起上线。原因：one-api 的 provision 按来源 IP 限流（60 次/20 分钟），DeepTutor 服务端代调时所有用户共用服务器 IP 这一个桶，不缓存会被页面上的模型列表、工具状态等读取打满（2026-11-04 事故）。模型列表等读取只返回去除 key 的元数据。
@@ -62,7 +65,7 @@ MOMORAIN_PROVISION_URL=https://momorain.com/one-api/api/momorain/provision
 
 Dockerfile 使用国内 npm、pip、apt 源；前端使用本机字体，不访问 Google Fonts。
 
-健康检查：API `/health/ready`。未登录请求 `/deeptutor/api/sessions` 应为 401，`/deeptutor/api/auth/status` 应为 enabled=true/authenticated=false。禁止功能应为 404。聊天和知识库操作还需要一个真实已登录且 provision ready 的账号。
+健康检查：API `/health/ready`。未登录请求 `/deeptutor/api/sessions` 应为 401，`/deeptutor/api/auth/status` 应为 enabled=true/authenticated=false，`/deeptutor/api/modules` 应为 200。禁止功能应为 404。无痕窗口打开 `/deeptutor/chat` 应停在页面上（不跳登录），点发送才弹登录说明。聊天和知识库操作还需要一个真实已登录且 provision ready 的账号。
 
 ## 备份与恢复
 
@@ -78,7 +81,7 @@ python /app/backup.py /backups/deeptutor-20261102
 
 ```sh
 .venv-web/bin/python -m pytest tests/momorain tests/api/test_unified_ws_protocol.py tests/api/test_session_search.py -q
-cd web && npx vitest run tests/momorain-base-path.spec.ts
+cd web && npx vitest run tests/momorain-base-path.spec.ts tests/momorain-guest.spec.ts
 npm run build
 ```
 

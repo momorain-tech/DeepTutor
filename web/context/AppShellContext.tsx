@@ -78,8 +78,11 @@ export function AppShellProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     return getStoredTheme() ?? getSystemTheme();
   });
-  // Always start with "en" to match SSR; hydrate from localStorage after mount
-  const [language, setLanguageState] = useState<AppLanguage>("en");
+  // Always start with the deployment default to match SSR; hydrate from localStorage after mount.
+  // momorain 部署默认中文：拿不到后端设置（断网、超时）时也先显示中文，而不是英文。
+  const [language, setLanguageState] = useState<AppLanguage>(
+    process.env.NEXT_PUBLIC_MOMORAIN_ENABLED === "true" ? "zh" : "en",
+  );
   const [languageReady, setLanguageReady] = useState(false);
   const [activeSessionId, setActiveSessionIdState] = useState<string | null>(
     () => readStoredActiveSessionId(),

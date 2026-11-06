@@ -12,6 +12,7 @@ import {
 import type { Capability } from "@/lib/capability-routes";
 import { apiFetch, apiUrl } from "@/lib/api";
 import { listLLMOptions } from "@/lib/llm-options";
+import { MOMORAIN_ENABLED, resolvePrincipal } from "@/lib/momorain-guest";
 
 type CapabilityAccessValue = {
   /** True until the first access probe resolves. */
@@ -57,6 +58,13 @@ export function CapabilityAccessProvider({
 
   const refresh = useCallback(async () => {
     try {
+      // momorain 访客：不读设置、不取模型列表（那会去 one-api 取 provision）。
+      // 界面保持可用，真正要调模型时由发送按钮提示登录。
+      if (MOMORAIN_ENABLED && (await resolvePrincipal()) === "guest") {
+        setIsAdmin(false);
+        setHasLlm(true);
+        return;
+      }
       // The settings payload only exposes the catalog to admins, so its
       // presence is our admin signal — admins are never gated.
       const res = await apiFetch(apiUrl("/api/settings"));

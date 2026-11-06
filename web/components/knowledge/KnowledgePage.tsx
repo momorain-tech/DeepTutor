@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { useMomorainPrincipal } from "@/lib/momorain-guest-hooks";
 import { Loader2 } from "lucide-react";
 import { useKnowledgeBases } from "@/hooks/useKnowledgeBases";
 import { updateRagProviderMode } from "@/features/knowledge/api/engines";
@@ -48,6 +49,7 @@ const CreateKbModal = dynamic(() => import("./CreateKbModal"));
 const ConnectKiwixModal = dynamic(() => import("./ConnectKiwixModal"));
 
 export default function KnowledgePage() {
+  const guest = useMomorainPrincipal() === "guest";
   const { t } = useTranslation();
   const router = useRouter();
   const routeParams = useParams<{ kbName?: string }>();
@@ -393,7 +395,13 @@ export default function KnowledgePage() {
 
   return (
     <div className="flex h-full flex-col bg-[var(--background)]">
-      {error && (
+      {/* momorain 访客：知识库是个人数据，没登录读不到——给一句说明，而不是红色报错。 */}
+      {guest && (
+        <div role="status" className="flex items-center justify-between gap-3 border-b border-[var(--border)] px-4 py-2 text-[12.5px]">
+          <span>当前未登录。登录后可以创建知识库、上传资料，并在对话里引用。</span>
+        </div>
+      )}
+      {error && !guest && (
         <div className="flex items-center justify-between gap-3 border-b border-red-200 bg-red-50 px-4 py-2 text-[12.5px] text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
           <span className="truncate">{error}</span>
           <div className="flex items-center gap-2">
