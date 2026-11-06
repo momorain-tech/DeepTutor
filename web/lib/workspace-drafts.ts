@@ -1,5 +1,6 @@
 import { activeWorkspaceId } from './workspace-scope'
 import { fetchAuthStatus } from './auth'
+import { lastAuthenticatedUserId } from './momorain-guest'
 
 export type WorkspaceDraft = {
   text: string
@@ -75,13 +76,14 @@ export async function transferWorkspaceDraft(destination: string): Promise<void>
 //
 // 访客在输入框里打的字，点「发送」时才发现要登录。登录页在 momorain.com/login，
 // 一去一回整页刷新，页面内存里的东西全没了；而上面那套草稿按用户 id 存，访客
-// 没有 id、存不进去。所以单独留一格：跳登录前存进来，登录回来**取一次就删**。
+// 没有 id、存不进去。所以以当前标签页的随机 nonce 暂存，登录回来原子地取一次。
 //
 // - 只放在本机浏览器（IndexedDB），不上传服务器；
-// - 30 分钟后作废，免得共用电脑时下一个人登录看到上一个访客的草稿；
-// - 只恢复到同一个页面路径，并且只填回输入框，不自动发送——
+// - 30 分钟后作废；已登录者的草稿还必须匹配原账号；
+// - 只恢复到同一标签页、页面路径和工作区，并且只填回输入框，不自动发送——
 //   发送会花钱，必须等用户看过、自己再点一次。
 const LOGIN_HANDOFF_KEY = 'momorain:login-handoff'
+const LOGIN_HANDOFF_PREFIX = `${LOGIN_HANDOFF_KEY}:`
 const LOGIN_HANDOFF_TTL_MS = 30 * 60 * 1000
 
 export type LoginHandoffDraft = WorkspaceDraft & {
@@ -89,6 +91,8 @@ export type LoginHandoffDraft = WorkspaceDraft & {
   capability?: string | null
   pathname: string
   savedAt: number
+  ownerId: string | null
+  workspaceId: string
 }
 
 async function handoffStore<T>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => IDBRequest<T> | void): Promise<T | undefined> {
@@ -107,9 +111,27 @@ async function handoffStore<T>(mode: IDBTransactionMode, run: (store: IDBObjectS
 }
 
 export async function saveLoginHandoffDraft(draft: WorkspaceDraft & { capability?: string | null }): Promise<void> {
-  if (!draft.text.trim() && !draft.attachments.length) return
-  const record: LoginHandoffDraft = { ...draft, pathname: window.location.pathname, savedAt: Date.now() }
-  await handoffStore('readwrite', store => { store.put(record, LOGIN_HANDOFF_KEY) })
+  const previous = sessionStorage.getItem(LOGIN_HANDOFF_KEY)
+  sessionStorage.removeItem(LOGIN_HANDOFF_KEY)
+  const token = crypto.randomUUID()
+  const record: LoginHandoffDraft = {
+    ...draft, pathname: window.location.pathname, savedAt: Date.now(),
+    ownerId: lastAuthenticatedUserId(), workspaceId: activeWorkspaceId(),
+  }
+  await handoffStore('readwrite', store => {
+    // 删除旧实现的全浏览器共享槽位；空输入也不能复活之前的草稿。
+    store.delete(LOGIN_HANDOFF_KEY)
+    if (previous) store.delete(LOGIN_HANDOFF_PREFIX + previous)
+    const cursor = store.openCursor(IDBKeyRange.bound(LOGIN_HANDOFF_PREFIX, LOGIN_HANDOFF_PREFIX + '\uffff'))
+    cursor.onsuccess = () => {
+      const item = cursor.result
+      if (!item) return
+      if (!item.value?.savedAt || Date.now() - item.value.savedAt >= LOGIN_HANDOFF_TTL_MS) item.delete()
+      item.continue()
+    }
+    if (draft.text.trim() || draft.attachments.length) store.put(record, LOGIN_HANDOFF_PREFIX + token)
+  })
+  if (draft.text.trim() || draft.attachments.length) sessionStorage.setItem(LOGIN_HANDOFF_KEY, token)
 }
 
 /**
@@ -117,10 +139,34 @@ export async function saveLoginHandoffDraft(draft: WorkspaceDraft & { capability
  * 没过期但属于别的页面的留着，等用户回到那个页面再取。
  */
 export async function takeLoginHandoffDraft(): Promise<LoginHandoffDraft | undefined> {
-  const record = await handoffStore<LoginHandoffDraft | undefined>('readonly', store => store.get(LOGIN_HANDOFF_KEY))
-  if (!record) return undefined
-  const fresh = Date.now() - record.savedAt < LOGIN_HANDOFF_TTL_MS
-  const here = record.pathname === window.location.pathname
-  if (!fresh || here) await handoffStore('readwrite', store => { store.delete(LOGIN_HANDOFF_KEY) })
-  return fresh && here ? record : undefined
+  const token = sessionStorage.getItem(LOGIN_HANDOFF_KEY)
+  if (!token) return undefined
+  const status = await fetchAuthStatus()
+  if (!status?.authenticated || !status.user_id) return undefined
+  const db = await database()
+  let consumed = false
+  try {
+    const value = await new Promise<LoginHandoffDraft | undefined>((resolve, reject) => {
+      // 读取与删除必须在同一事务：即使两个页面拿到相同 nonce，也只能消费一次。
+      const tx = db.transaction('drafts', 'readwrite')
+      const store = tx.objectStore('drafts')
+      const key = LOGIN_HANDOFF_PREFIX + token
+      const request = store.get(key)
+      let result: LoginHandoffDraft | undefined
+      request.onsuccess = () => {
+        const record = request.result as LoginHandoffDraft | undefined
+        if (!record || Date.now() - record.savedAt >= LOGIN_HANDOFF_TTL_MS) {
+          store.delete(key); consumed = true; return
+        }
+        if (record.pathname !== window.location.pathname || record.workspaceId !== activeWorkspaceId()) return
+        if (record.ownerId && record.ownerId !== status.user_id) return
+        result = record; store.delete(key); consumed = true
+      }
+      tx.oncomplete = () => resolve(result)
+      tx.onerror = () => reject(tx.error)
+      tx.onabort = () => reject(tx.error)
+    })
+    if (consumed && sessionStorage.getItem(LOGIN_HANDOFF_KEY) === token) sessionStorage.removeItem(LOGIN_HANDOFF_KEY)
+    return value
+  } finally { db.close() }
 }

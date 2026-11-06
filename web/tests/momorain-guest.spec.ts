@@ -119,3 +119,35 @@ describe("去登录", () => {
     expect(navigatedTo).toBe("https://momorain.com/login?next=%2Fdeeptutor%2Fchat");
   });
 });
+
+describe("握手失败的登录复查", () => {
+  it.each([false, true])("1006：网络故障=%s", async (networkFailure) => {
+    if (networkFailure) vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    else mockBackend(false);
+    const events = loginEvents();
+    const guest = await import("@/lib/momorain-guest");
+    guest.notePrincipalFromStatus({ authenticated: true, user_id: "account-A" });
+    const { TurnRuntimeClient } = await import("@/features/chat/transport/TurnRuntimeClient");
+    const handlers = new Map<string, (e: unknown) => void>();
+    const socket = { readyState: 0, send: vi.fn(), close: vi.fn(), addEventListener: (name: string, fn: (e: unknown) => void) => handlers.set(name, fn) };
+    const factory = vi.fn(() => socket);
+    const timer = vi.fn();
+    const client = new TurnRuntimeClient({socketFactory: factory as never, onEvent: () => {}, scheduler: {setTimeout: timer, clearTimeout: () => {}}});
+    client.setResumeCursor("active-turn", 0);
+    client.connect();
+    handlers.get("close")?.({code: 1006});
+    if (networkFailure) {
+      await vi.waitFor(() => expect(timer).toHaveBeenCalledTimes(1));
+      expect(events).toEqual([]);
+      expect(guest.currentPrincipal()).toBe("user");
+    } else {
+      await vi.waitFor(() => expect(client.state).toBe("stopped"));
+      expect(timer).not.toHaveBeenCalled();
+      expect(events).toEqual([{kind: "expired"}]);
+      client.connect();
+      expect(factory).toHaveBeenCalledTimes(1);
+      expect(guest.lastAuthenticatedUserId()).toBe("account-A");
+    }
+    client.stop();
+  });
+});

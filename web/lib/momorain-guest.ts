@@ -36,6 +36,8 @@ export type Principal = "unknown" | "guest" | "user";
 let principal: Principal = "unknown";
 let probe: Promise<Principal> | null = null;
 let expiredNotified = false;
+// 登录过期后仍记住原账号，仅用于防止其草稿被恢复给另一个账号。
+let lastUserId: string | null = null;
 const listeners = new Set<() => void>();
 
 function emit() {
@@ -44,6 +46,10 @@ function emit() {
 
 export function currentPrincipal(): Principal {
   return principal;
+}
+
+export function lastAuthenticatedUserId(): string | null {
+  return lastUserId;
 }
 
 export function subscribePrincipal(listener: () => void): () => void {
@@ -55,10 +61,18 @@ export function subscribePrincipal(listener: () => void): () => void {
 
 /** lib/auth.ts 每拿到一次登录状态就同步过来，保证两边对「是谁」的判断一致。 */
 export function notePrincipalFromStatus(
-  status: { enabled?: boolean; authenticated?: boolean } | null,
+  status: { enabled?: boolean; authenticated?: boolean; user_id?: string } | null,
 ): void {
   if (!MOMORAIN_ENABLED || !status) return;
   const next: Principal = status.authenticated ? "user" : "guest";
+  if (next === "guest" && principal === "user") {
+    noteSessionExpired();
+    return;
+  }
+  if (next === "user") {
+    lastUserId = typeof status.user_id === "string" ? status.user_id : null;
+    expiredNotified = false;
+  }
   if (next === principal) return;
   principal = next;
   emit();
@@ -69,8 +83,8 @@ export function notePrincipalFromStatus(
  * 这里直接用 fetch（不走 apiFetch），否则 apiFetch 判断身份时又要先判断身份，会绕圈。
  * 问不到（网络故障）就返回 unknown：照常发请求，让后端去拦。
  */
-export function resolvePrincipal(): Promise<Principal> {
-  if (principal !== "unknown") return Promise.resolve(principal);
+export function resolvePrincipal(force = false): Promise<Principal> {
+  if (!force && principal !== "unknown") return Promise.resolve(principal);
   if (!probe) {
     probe = fetch(`${BASE_PATH}/api/auth/status`, {
       credentials: "include",

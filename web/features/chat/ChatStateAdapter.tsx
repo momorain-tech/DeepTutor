@@ -1,6 +1,6 @@
 "use client";
 
-import { MOMORAIN_ENABLED, currentPrincipal, requestLogin } from "@/lib/momorain-guest";
+import { MOMORAIN_ENABLED, currentPrincipal, requestLogin, resolvePrincipal } from "@/lib/momorain-guest";
 import { supportsSubmissionReplacement } from "@/lib/session-api";
 
 import { activeWorkspaceId } from "@/lib/workspace-scope";
@@ -2970,8 +2970,10 @@ export function ChatStateAdapterProvider({
     ) => {
       // momorain 兜底：输入框已经在「发送」时拦过访客，这里再拦一次，
       // 覆盖开场白按钮、重新生成等其他发消息的入口——访客一律不建聊天 WebSocket。
-      if (MOMORAIN_ENABLED && currentPrincipal() === "guest") {
-        requestLogin({ kind: "action", message: "发送消息会调用大模型、保存对话，需要先登录 momorain 账号。" });
+      if (MOMORAIN_ENABLED && currentPrincipal() !== "user") {
+        if ((await resolvePrincipal()) === "guest") {
+          requestLogin({ kind: "action", message: "发送消息会调用大模型、保存对话，需要先登录 momorain 账号。" });
+        }
         return false;
       }
       const generation = runtimeGeneration.current;
