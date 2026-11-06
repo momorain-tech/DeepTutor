@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { logout } from "@/lib/auth";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { MOMORAIN_ENABLED } from "@/lib/momorain-guest";
 
 interface LogoutButtonProps {
   collapsed?: boolean;
@@ -14,9 +15,10 @@ interface LogoutButtonProps {
 export function LogoutButton({ collapsed = false }: LogoutButtonProps) {
   const router = useRouter();
   const { t } = useTranslation();
-  const { enabled } = useAuthStatus();
+  const { enabled, authenticated } = useAuthStatus();
 
-  if (!enabled) return null;
+  // 统一账号的退出操作在顶部昵称链接的账号中心完成；上游按钮调用的是已关闭的本地退出接口。
+  if (MOMORAIN_ENABLED || !enabled || !authenticated) return null;
 
   async function handleLogout() {
     await logout();
