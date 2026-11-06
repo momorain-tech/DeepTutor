@@ -185,7 +185,7 @@ export function ClassicSidebarShell({
   /* ---- Collapsed state ---- */
   if (collapsed) {
     return (
-      <aside className="group/sb relative flex h-dvh w-[60px] shrink-0 flex-col items-center bg-[var(--secondary)] py-3 transition-all duration-200">
+      <aside className="group/sb relative flex h-[var(--app-viewport-h)] w-[60px] shrink-0 flex-col items-center bg-[var(--secondary)] py-3 transition-all duration-200">
         {/* Header: logo + collapse toggle (toggle replaces logo on hover) */}
         <div className="relative mb-2 flex h-9 w-9 items-center justify-center">
           <Link
@@ -253,7 +253,7 @@ export function ClassicSidebarShell({
   return (
     <aside
       style={{ "--sidebar-width": `${resize.width}px` } as CSSProperties}
-      className="relative flex h-dvh w-[var(--sidebar-width)] max-w-[45vw] shrink-0 flex-col bg-[var(--secondary)] max-md:w-[220px] max-md:max-w-[85vw]"
+      className="relative flex h-[var(--app-viewport-h)] w-[var(--sidebar-width)] max-w-[45vw] shrink-0 flex-col bg-[var(--secondary)] max-md:w-[220px] max-md:max-w-[85vw]"
     >
       {/* Header: logo + collapse toggle */}
       <div className="flex h-[52px] shrink-0 items-center justify-between px-4">

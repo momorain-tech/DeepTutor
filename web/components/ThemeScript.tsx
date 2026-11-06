@@ -45,6 +45,15 @@ export default function ThemeScript() {
       }
       // UI layout tokens (see lib/ui-layout.ts) must also paint before React.
       try {
+        ${process.env.NEXT_PUBLIC_MOMORAIN_ENABLED === "true" ? `
+        // momorain 一次性迁移：旧用户存过「经典」的，第一次打开切到现代布局。
+        // 记下已迁移，之后用户在设置里再选回经典会被尊重，不会每次都被改掉。
+        if (!localStorage.getItem('momorain.ui-layout-migrated')) {
+          if (localStorage.getItem('${UI_LAYOUT_STORAGE_KEY}') === 'classic') {
+            localStorage.setItem('${UI_LAYOUT_STORAGE_KEY}', 'modern');
+          }
+          localStorage.setItem('momorain.ui-layout-migrated', '1');
+        }` : ""}
         const layout = localStorage.getItem('${UI_LAYOUT_STORAGE_KEY}');
         document.documentElement.setAttribute(
           '${UI_LAYOUT_ATTRIBUTE}',

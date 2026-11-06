@@ -1509,3 +1509,12 @@ a[href^="#dt-locator-"]:hover {
 
 /* 使用本机字体，构建和页面都不依赖 Google Fonts 外网。 */
 .momorain-fonts { --font-sans: "PingFang SC", "Microsoft YaHei", Arial, sans-serif; --font-serif: "Songti SC", "SimSun", Georgia, serif; }
+
+/*
+ * 应用外壳的可用高度。上游按整屏 100dvh 排版；momorain 在页面最上面多了一条账号栏
+ * （components/MomorainNav.tsx），外壳仍按整屏算就会被往下挤出屏幕——经典布局侧栏
+ * 最底部的「设置」入口就是这样看不见、也滚不到的。所以有账号栏时扣掉它的高度。
+ * 只用于跟在账号栏下面排版的外壳（AppShell、两套侧栏）；全屏浮层仍用 100dvh。
+ */
+:root { --momorain-nav-h: 0px; --app-viewport-h: calc(100dvh - var(--momorain-nav-h)); }
+:root.momorain-has-nav { --momorain-nav-h: 2.75rem; }

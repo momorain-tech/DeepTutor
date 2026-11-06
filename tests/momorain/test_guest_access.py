@@ -151,3 +151,23 @@ async def test_turn_entry_refuses_without_identity(no_upstream):
         await TurnApplicationService.start_turn(object.__new__(TurnApplicationService), {})
     assert refused.value.status_code == 401
     assert no_upstream == []
+
+
+def test_new_users_default_to_chinese(monkeypatch):
+    """momorain 部署面向中文用户：没保存过语言的新用户（含访客）界面和回复都默认中文。"""
+    import importlib
+
+    from deeptutor.services.settings import interface_settings
+
+    try:
+        monkeypatch.setenv("MOMORAIN_ENABLED", "true")
+        zh = importlib.reload(interface_settings)
+        assert zh.DEFAULT_UI_SETTINGS["language"] == "zh"
+        assert zh.DEFAULT_UI_SETTINGS["response_language"] == "zh"
+        # 已保存过语言的用户以自己的选择为准。
+        assert zh.resolve_languages({"language": "en"})["language"] == "en"
+        monkeypatch.setenv("MOMORAIN_ENABLED", "false")
+        assert importlib.reload(interface_settings).DEFAULT_UI_SETTINGS["language"] == "en"
+    finally:
+        monkeypatch.undo()
+        importlib.reload(interface_settings)

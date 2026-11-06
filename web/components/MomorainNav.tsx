@@ -79,7 +79,7 @@ export default function MomorainNav() {
   }, [prompt]);
   if (process.env.NEXT_PUBLIC_MOMORAIN_ENABLED !== "true") return null;
   return <>
-    <header className="flex min-h-11 items-center justify-between gap-2 border-b px-3 text-sm" aria-label="momorain 账号">
+    <header className="flex h-[var(--momorain-nav-h)] items-center justify-between gap-2 border-b px-3 text-sm" aria-label="momorain 账号">
       <span className="shrink-0">momorain · DeepTutor</span>
       <div className="flex min-w-0 items-center justify-end gap-2">
         {error && <span role="status" className="truncate" title={error}>{error}</span>}
