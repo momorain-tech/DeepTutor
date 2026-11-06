@@ -5,6 +5,8 @@ import { AlertTriangle, Loader2, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSettings } from "@/features/settings/store/SettingsStore";
+import { requestLogin } from "@/lib/momorain-guest";
+import { useMomorainPrincipal } from "@/lib/momorain-guest-hooks";
 
 // Surface the result of the initial /api/settings + /api/system/status
 // load so Docker / first-run users know *why* the page is empty when the
@@ -14,6 +16,7 @@ export function SettingsLoadStatusBanner() {
   const { t } = useTranslation();
   const { settingsLoading, settingsError, reloadSettings } = useSettings();
   const [retrying, setRetrying] = useState(false);
+  const guest = useMomorainPrincipal() === "guest";
 
   if (settingsLoading) {
     return (
@@ -25,6 +28,18 @@ export function SettingsLoadStatusBanner() {
   }
 
   if (!settingsError) return null;
+
+  // momorain 访客：设置是存在个人账号里的，没登录本来就读不到——
+  // 说明一句「显示的是默认值、登录后可保存」，别让人以为后端坏了。
+  if (guest) {
+    return (
+      <div role="status" className="mt-3 flex items-center gap-3 rounded-md border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-2 text-sm">
+        <div className="min-w-0 flex-1">当前未登录，这里显示的是默认设置。登录后可以保存你自己的设置。</div>
+        <button type="button" onClick={() => requestLogin({ kind: "action", message: "设置会保存到你的 momorain 账号，需要先登录。" })}
+          className="shrink-0 rounded-md border px-2 py-1 text-xs font-medium">去登录</button>
+      </div>
+    );
+  }
 
   const handleRetry = async () => {
     setRetrying(true);

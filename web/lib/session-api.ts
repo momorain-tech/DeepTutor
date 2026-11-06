@@ -1,4 +1,5 @@
 import { clearFailedSubmission } from "@/lib/failed-submissions";
+import { LoginRequiredError, MOMORAIN_ENABLED } from "@/lib/momorain-guest";
 import { scopedUrl } from "@/lib/workspace-scope";
 import { notifySessionsChanged } from "@/lib/session-events";
 import { apiFetch, apiUrl } from "@/lib/api";
@@ -210,6 +211,9 @@ export interface QuizResultItem {
 }
 
 async function expectJson<T>(response: Response): Promise<T> {
+  // momorain：401 不再整页跳登录（访客要能先浏览；登录过期由 apiFetch 统一弹框）。
+  // 抛出 LoginRequiredError，让历史列表之类的地方显示「登录后查看」。
+  if (response.status === 401 && MOMORAIN_ENABLED) throw new LoginRequiredError();
   if (response.status === 401 && typeof window !== "undefined") {
     window.location.href = loginHref(browserReturnPath(window.location));
     return new Promise(() => {});

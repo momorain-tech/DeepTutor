@@ -1,5 +1,7 @@
 'use client'
 
+// EventSource 不走 apiFetch，得自己补 /deeptutor 前缀；以前漏了，线上一直 404、退回定时轮询。
+import { withBasePath } from '@/lib/base-path'
 import { useSyncExternalStore } from 'react'
 import { activeWorkspaceId } from './workspace-scope'
 import {
@@ -61,7 +63,7 @@ export function startTaskBoardSync({ stream = true }: { stream?: boolean } = {})
     void refreshTaskBoard()
     const source =
       stream && typeof EventSource !== 'undefined'
-        ? new EventSource(taskBoardUrl('/events', workspaceId), { withCredentials: true })
+        ? new EventSource(withBasePath(taskBoardUrl('/events', workspaceId)), { withCredentials: true })
         : null
     let fallback: ReturnType<typeof setInterval> | undefined
     const startFallback = () => {

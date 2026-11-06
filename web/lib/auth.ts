@@ -2,6 +2,7 @@ import { invalidateClientCache } from "./client-cache";
 import { browserStorage } from "@/shared/storage";
 import { apiFetch, apiUrl, setRuntimeAuthEnabled } from "@/lib/api";
 import { updateRecoveryPrincipal } from "@/lib/recovery-principal";
+import { notePrincipalFromStatus } from "@/lib/momorain-guest";
 
 // Auth state is resolved at runtime from the backend (`/api/auth/status`),
 // not from a build-time/env constant: the browser bundle never sees
@@ -96,6 +97,8 @@ export function fetchAuthStatus(): Promise<AuthStatus | null> {
         if (generation !== authGeneration) return null;
         if (status !== null) setRuntimeAuthEnabled(Boolean(status.enabled));
         updateRecoveryPrincipal(status);
+        // momorain 访客模式也据此判断「是不是访客」（lib/momorain-guest.ts）。
+        notePrincipalFromStatus(status);
         cachedAuthStatus = {
           value: status,
           // Retry unavailable backends quickly; stable answers can be shared

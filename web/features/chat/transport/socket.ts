@@ -1,6 +1,8 @@
 import { withBasePath } from "@/lib/base-path";
 export interface SocketMessageEvent {
   data: unknown;
+  /** close 事件才有：WebSocket 关闭码。momorain 后端用 4401 表示未登录/登录过期。 */
+  code?: number;
 }
 
 export interface TurnSocket {

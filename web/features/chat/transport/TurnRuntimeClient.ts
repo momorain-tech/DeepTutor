@@ -3,6 +3,7 @@ import type {
   ServerEvent,
   StreamEvent,
 } from "@/contracts/generated/turn-protocol";
+import { MOMORAIN_ENABLED, noteSessionExpired } from "@/lib/momorain-guest";
 import {
   buildPing,
   buildResumeTurn,
@@ -180,7 +181,7 @@ export class TurnRuntimeClient {
     socket.addEventListener("message", (event) =>
       this.handleMessage(socket, event.data),
     );
-    socket.addEventListener("close", () => this.handleClose(socket));
+    socket.addEventListener("close", (event) => this.handleClose(socket, event?.code));
     socket.addEventListener("error", () => {
       if (socket === this.socket)
         this.options.onDiagnostic?.("turn socket error; awaiting close");
@@ -436,9 +437,18 @@ export class TurnRuntimeClient {
     });
   }
 
-  private handleClose(socket: TurnSocket): void {
+  private handleClose(socket: TurnSocket, code?: number): void {
     if (socket !== this.socket) return;
     this.socket = null;
+    // momorain：4401 = 后端认为没登录（多半是登录过期）。重连多少次结果都一样，
+    // 而且每次重连都要去账号服务核验一次，所以停在这里，提示用户重新登录。
+    if (code === 4401 && MOMORAIN_ENABLED) {
+      this.openedAt = null;
+      this.clearReplayProbe();
+      this.setState("idle");
+      noteSessionExpired();
+      return;
+    }
     if (
       this.openedAt !== null &&
       Date.now() - this.openedAt >= STABLE_CONNECTION_MS

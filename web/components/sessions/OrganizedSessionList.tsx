@@ -13,6 +13,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useMomorainPrincipal } from "@/lib/momorain-guest-hooks";
 import {
   deriveSessionMark,
   sessionKindOf,
@@ -135,6 +136,10 @@ export default function OrganizedSessionList({
   onResetOrder,
   scrollRef,
 }: OrganizedSessionListProps) {
+  // momorain 访客：历史对话是个人数据，页面根本没去读——提示「登录后可见」，
+  // 而不是说「还没有对话」让人误以为记录丢了。
+  const guest = useMomorainPrincipal() === "guest";
+  const emptyText = guest ? "登录后在这里查看你的历史对话" : emptyLabel;
   // Reads the set; `SessionList` owns keeping it current.
   const unread = useUnreadSessions();
   const { t } = useTranslation();
@@ -295,7 +300,7 @@ export default function OrganizedSessionList({
   if (entries.length === 0) {
     return (
       <div className="px-3 py-2 text-[11px] text-[var(--muted-foreground)]/65">
-        {emptyLabel ?? t("No conversations yet")}
+        {emptyText ?? t("No conversations yet")}
       </div>
     );
   }
@@ -689,7 +694,7 @@ export default function OrganizedSessionList({
           renderRow={(row) => renderRow(row)}
           empty={
             <p className="dt-navigation-empty">
-              {timeline.query ? t("navigation.noResults") : emptyLabel ?? t("navigation.noSessions")}
+              {timeline.query ? t("navigation.noResults") : emptyText ?? t("navigation.noSessions")}
             </p>
           }
         />

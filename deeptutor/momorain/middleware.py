@@ -1,4 +1,11 @@
-"""ASGI 门禁同时覆盖 HTTP、上传和 WebSocket，身份在执行任务前安装并最终清理。"""
+"""ASGI 门禁同时覆盖 HTTP、上传和 WebSocket，身份在执行任务前安装并最终清理。
+
+访问规则（「先浏览，保存或调用模型时再登录」）：
+- 未登录：只能读 guest.py 白名单里的公共只读接口（登录状态、模块/能力说明、界面默认值），
+  其余一律 401——包括所有私人数据读取、服务器写入、上传、WebSocket 和模型调用。
+- 已登录：按用户安装身份后进入原路由；路由层的 require_auth 和回合入口的 provision
+  还各自再查一次身份，这里放错了也不会直接漏到管理员目录或付费调用。
+"""
 
 from __future__ import annotations
 
@@ -79,15 +86,18 @@ class MomorainMiddleware:
             try:
                 user = await asyncio.to_thread(authenticate, token)
             except HTTPException as exc:
-                if (
-                    path == "/api/auth/status"
-                    and exc.status_code == 401
-                    and scope["type"] == "http"
-                ):
-                    return await JSONResponse(
-                        {"enabled": True, "authenticated": False},
-                        headers={"Cache-Control": "no-store"},
-                    )(scope, receive, send)
+                # 未登录（没 Cookie 或 Cookie 已失效）：只有白名单里的公共只读接口有回应，
+                # 由 guest.py 单独作答、不进原路由——原路由缺身份时会回退到本地管理员。
+                # 这里在 ensure_external_user 之前返回，所以访客不会建任何用户目录。
+                # 登录服务不可用（503）不算未登录，照常报错，免得把已登录用户误当访客。
+                if exc.status_code == 401 and scope["type"] == "http":
+                    from .guest import guest_response
+
+                    body = await guest_response(path, scope.get("method", "GET"))
+                    if body is not None:
+                        return await JSONResponse(
+                            body, headers={"Cache-Control": "no-store"}
+                        )(scope, receive, send)
                 raise
             from deeptutor.multi_user.identity import ensure_external_user
 

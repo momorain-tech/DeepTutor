@@ -2,6 +2,16 @@ import { withBasePath } from "@/lib/base-path";
 import { ApiError, type AppError, type AppErrorScope } from "./errors";
 import { browserReturnPath, loginHref } from "../auth/return-url";
 import { scopedUrl } from "@/lib/workspace-scope";
+import {
+  MOMORAIN_ENABLED,
+  apiPathOf,
+  currentPrincipal,
+  guestRefusal,
+  isGuestReadable,
+  noteSessionExpired,
+  requestLogin,
+  resolvePrincipal,
+} from "@/lib/momorain-guest";
 
 export interface RequestOptions extends RequestInit {
   scope?: AppErrorScope;
@@ -34,6 +44,9 @@ export async function apiFetch(
   const scopedInput = typeof input === "string" ? withBasePath(scopedUrl(input))
     : input instanceof URL ? new URL(scopedUrl(input.toString()))
     : new Request(scopedUrl(input.url), input);
+  if (MOMORAIN_ENABLED && typeof window !== "undefined") {
+    return momorainFetch(scopedInput, fetchInit);
+  }
   const response = await fetch(scopedInput, { credentials: "include", ...fetchInit });
 
   if (
@@ -46,6 +59,27 @@ export async function apiFetch(
     return new Promise(() => {});
   }
 
+  return response;
+}
+
+/**
+ * momorain 模式下的请求出口（规则见 lib/momorain-guest.ts 顶部）。
+ * 和上游最大的不同：401 不再把整页跳去登录页——访客要能先看页面，
+ * 登录过期也只弹框提示，用户手上没保存的内容不会被一跳了之。
+ */
+async function momorainFetch(input: RequestInfo | URL, init: RequestInit): Promise<Response> {
+  const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+  const method = (init.method ?? (input instanceof Request ? input.method : "GET")).toUpperCase();
+  if (!isGuestReadable(apiPathOf(url), method)) {
+    const who = await resolvePrincipal();
+    if (who === "guest") {
+      // 访客：不发请求。读操作安静地当作「没数据」；写操作才弹登录说明。
+      if (method !== "GET" && method !== "HEAD") requestLogin({ kind: "action" });
+      return guestRefusal();
+    }
+  }
+  const response = await fetch(input, { credentials: "include", ...init });
+  if (response.status === 401 && currentPrincipal() === "user") noteSessionExpired();
   return response;
 }
 
