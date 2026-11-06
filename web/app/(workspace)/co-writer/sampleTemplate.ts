@@ -1,3 +1,5 @@
+import { withBasePath } from "@/lib/base-path";
+
 const FENCE = "```";
 
 export const CO_WRITER_SAMPLE_TEMPLATE = `# DeepTutor Co-Writer
@@ -106,7 +108,7 @@ ${FENCE}
 
 ### Images
 
-![](/brand/color-logo.png)
+![](${withBasePath("/brand/color-logo.png")})
 
 > DeepTutor brand mark used inside the co-writer template.
 
