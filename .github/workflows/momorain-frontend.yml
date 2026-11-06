@@ -26,7 +26,12 @@ jobs:
         working-directory: web
         run: |
           npm run typecheck
-          npx vitest run tests/momorain-base-path.spec.ts
+          npx vitest run tests/momorain-base-path.spec.ts tests/momorain-guest.spec.ts
+      - name: 登录草稿真实浏览器回归
+        working-directory: web
+        run: |
+          if ! command -v google-chrome >/dev/null; then npx playwright install --with-deps chrome; fi
+          node scripts/test-login-handoff.cjs
       - name: 编译固定子路径网页
         working-directory: web
         env:
