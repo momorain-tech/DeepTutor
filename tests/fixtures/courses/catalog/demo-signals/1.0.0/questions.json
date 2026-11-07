@@ -1,0 +1,78 @@
+{
+  "questions": [
+    {
+      "id": "q-green",
+      "version": 1,
+      "lesson": "colors",
+      "knowledge_point": "color-meaning",
+      "type": "single_choice",
+      "prompt": "绿灯表示什么？",
+      "options": [
+        { "label": "A", "body": "可以进港" },
+        { "label": "B", "body": "停船等待" },
+        { "label": "C", "body": "立即离港" }
+      ],
+      "answer": { "choices": ["A"] },
+      "explanation": "教材第 1 课：绿灯 = 可以进港。",
+      "sources": ["handbook"],
+      "difficulty": "easy"
+    },
+    {
+      "id": "q-blink",
+      "version": 1,
+      "lesson": "colors",
+      "knowledge_point": "steady-vs-blink",
+      "type": "true_false",
+      "prompt": "闪烁的灯和常亮的灯含义完全相同。",
+      "answer": { "value": false },
+      "explanation": "闪烁表示「注意，状态即将改变」。",
+      "sources": ["handbook"]
+    },
+    {
+      "id": "q-red-word",
+      "version": 1,
+      "lesson": "colors",
+      "knowledge_point": "color-meaning",
+      "type": "fill_blank",
+      "prompt": "红灯表示____。（两个字）",
+      "answer": { "accepted": ["停船", "停船等待"] },
+      "explanation": "红灯 = 停船等待。",
+      "sources": ["handbook"]
+    },
+    {
+      "id": "q-combo-multi",
+      "version": 1,
+      "lesson": "combos",
+      "knowledge_point": "combo-reading",
+      "type": "multiple_choice",
+      "prompt": "读组合信号时，下列哪些做法正确？",
+      "options": [
+        { "label": "A", "body": "先读上面那盏灯" },
+        { "label": "B", "body": "先读下面那盏灯" },
+        { "label": "C", "body": "闪烁的那盏优先" }
+      ],
+      "answer": { "choices": ["A", "C"] },
+      "explanation": "从上往下读；有闪烁的灯时先看闪烁的。",
+      "sources": ["handbook"]
+    },
+    {
+      "id": "q-combo-open",
+      "version": 1,
+      "lesson": "combos",
+      "knowledge_point": "combo-reading",
+      "type": "open",
+      "prompt": "上面一盏绿灯常亮、下面一盏黄灯闪烁，请说明这个组合的含义和你的读法。",
+      "rubric": {
+        "criteria": [
+          { "id": "order", "description": "说明了从上往下、闪烁优先的读法", "points": 1 },
+          { "id": "meaning", "description": "得出「可以进港，但要注意状态即将变化」", "points": 2 }
+        ],
+        "partial_ratio": 0.3,
+        "pass_ratio": 0.66,
+        "reference_answer": "先看闪烁的黄灯：注意变化；再看上面绿灯：可以进港。合起来：可以进港，但状态马上会变。"
+      },
+      "explanation": "",
+      "sources": ["handbook", "notice"]
+    }
+  ]
+}

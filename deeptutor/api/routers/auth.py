@@ -707,6 +707,9 @@ def _learning_surface_for_path(
         # the router already scopes every record to the current account, so
         # all methods (including progress PATCH/POST) belong to "chat".
         ("/api/mastery-paths", "chat"),
+        # Official-course enrollments create and drive the learner's own mastery
+        # paths, so they belong to the same surface as Mastery Path.
+        ("/api/course-enrollments", "chat"),
     ):
         if normalized == root or normalized.startswith(f"{root}/"):
             return surface

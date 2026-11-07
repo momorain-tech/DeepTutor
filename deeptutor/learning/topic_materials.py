@@ -479,6 +479,22 @@ def build_topic_materials(sources: Iterable[Any]) -> TopicMaterials:
                 )
             )
             continue
+        if kind == "course":
+            # Official course lesson (momorain). Resolved through the learner's
+            # own enrollment and its pinned version — never as a file path.
+            try:
+                from deeptutor.learning.courses.materials import load_course_material
+
+                material = load_course_material(source, label)
+            except Exception:
+                logger.exception("Failed to load course material id=%s", source_id)
+                result.warnings.append(f"{kind}:{source_id}")
+                material = TopicMaterial(
+                    sid="", kind=kind, name=label, available=False, note="could not be loaded"
+                )
+            budget -= len(material.full_text)
+            result.materials.append(material)
+            continue
         try:
             from contextlib import nullcontext
 

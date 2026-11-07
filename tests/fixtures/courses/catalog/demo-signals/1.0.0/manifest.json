@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "course_id": "demo-signals",
+  "version": "1.0.0",
+  "title": "示例课程：灯塔信号",
+  "subtitle": "仅供开发联调的模拟课程，内容全部虚构",
+  "summary": "用一套虚构的「灯塔信号」规则演示官方课程的完整学习闭环：读教材、AI 辅导、练习、复习。",
+  "language": "zh-CN",
+  "tags": ["示例", "开发用"],
+  "editors": [{ "name": "示例编者", "role": "编选" }],
+  "review": {
+    "reviewers": [{ "name": "示例审核人", "role": "内容审核" }],
+    "reviewed_at": "2026-11-07",
+    "note": "模拟数据，非真实审核"
+  },
+  "updated_at": "2026-11-07",
+  "disclaimer": "本课程内容纯属虚构，仅用于测试课程功能。",
+  "changelog": ""
+}

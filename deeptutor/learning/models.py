@@ -434,6 +434,11 @@ class TopicSourceKind(str, Enum):
     COWRITER = "cowriter"
     #: One partner-group conversation, as ``{group_id}:{session_key}``.
     PARTNER_GROUP = "partner_group"
+    #: One lesson of an official course the learner enrolled in (momorain).
+    #: ``source_id`` is ``course:{course_id}@{version}/{lesson_id}``; the reader
+    #: resolves it through the enrollment in this workspace, never as a path.
+    #: Only the enrollment flow may create it — the generic topic API rejects it.
+    COURSE = "course"
 
 
 class TopicSource(BaseModel):

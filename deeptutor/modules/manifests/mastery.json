@@ -17,7 +17,8 @@
     "deeptutor/api/routers/mastery_path.py",
     "deeptutor/tools/mastery_nav.py",
     "deeptutor/tools/mastery_tool.py",
-    "deeptutor/services/mastery_hints.py"
+    "deeptutor/services/mastery_hints.py",
+    "deeptutor/api/routers/courses.py"
   ],
   "capabilities": {
     "mastery_path": {
@@ -166,12 +167,35 @@
       },
       "auth": "public",
       "order": 623
+    },
+    {
+      "reference": "deeptutor.api.routers.courses:public_router",
+      "options": {
+        "prefix": "/api/courses",
+        "tags": [
+          "courses"
+        ]
+      },
+      "auth": "public",
+      "order": 603
+    },
+    {
+      "reference": "deeptutor.api.routers.courses:router",
+      "options": {
+        "prefix": "/api/course-enrollments",
+        "tags": [
+          "courses"
+        ]
+      },
+      "auth": "learning",
+      "order": 604
     }
   ],
   "commands": [],
   "navigation": [
     "/mastery",
-    "/learning/mastery"
+    "/learning/mastery",
+    "/learning/courses"
   ],
   "services": [],
   "requirements": [],

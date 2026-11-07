@@ -1,5 +1,5 @@
 {
-  "fingerprint": "6d90ec2c45a1d9f3f152c7577772bcdd05ea8b8f2b22a7dcca57e0d09db0097b",
+  "fingerprint": "522a5141aa49e04eb9733221e92b05c3f5fc644bb28985588eded0c91e65bf30",
   "routers": {
     "deeptutor.api.routers.auth:router": [
       {
@@ -1430,6 +1430,98 @@
       {
         "path": "/progress/{book_id}/generate-from-reading",
         "name": "generate_from_reading",
+        "kind": "http",
+        "methods": [
+          "POST"
+        ]
+      }
+    ],
+    "deeptutor.api.routers.courses:public_router": [
+      {
+        "path": "",
+        "name": "list_courses",
+        "kind": "http",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "path": "/{course_id}",
+        "name": "get_course",
+        "kind": "http",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "path": "/{course_id}/preview",
+        "name": "get_course_preview",
+        "kind": "http",
+        "methods": [
+          "GET"
+        ]
+      }
+    ],
+    "deeptutor.api.routers.courses:router": [
+      {
+        "path": "",
+        "name": "list_enrollments",
+        "kind": "http",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "path": "",
+        "name": "enroll",
+        "kind": "http",
+        "methods": [
+          "POST"
+        ]
+      },
+      {
+        "path": "/{enrollment_id}",
+        "name": "get_enrollment",
+        "kind": "http",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "path": "/{enrollment_id}/course",
+        "name": "get_enrollment_course",
+        "kind": "http",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "path": "/{enrollment_id}/lessons/{lesson_id}",
+        "name": "get_lesson",
+        "kind": "http",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "path": "/{enrollment_id}/lessons/{lesson_id}/progress",
+        "name": "put_reading_progress",
+        "kind": "http",
+        "methods": [
+          "PUT"
+        ]
+      },
+      {
+        "path": "/{enrollment_id}/lessons/{lesson_id}/questions",
+        "name": "list_lesson_questions",
+        "kind": "http",
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "path": "/{enrollment_id}/questions/{question_id}/submissions",
+        "name": "submit_answer",
         "kind": "http",
         "methods": [
           "POST"

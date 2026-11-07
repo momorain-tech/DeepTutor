@@ -28,6 +28,7 @@ import {
 } from './LearningShell'
 import { LearningCard } from './LearningCard'
 import { LearningWays } from './LearningWays'
+import { OfficialCoursesHome } from './courses/OfficialCoursesHome'
 import { LEARNING_SURFACES, learningSurface } from './surfaces'
 
 export function LearningDashboard() {
@@ -55,6 +56,9 @@ export function LearningDashboard() {
         <input aria-label={t('navigation.searchLearning')} placeholder={t('navigation.searchLearning')} value={query} onChange={event => { setQuery(event.target.value); setLimit(24) }} className="ml-auto h-9 rounded-lg border border-border bg-transparent px-3 text-xs outline-none focus:border-ring" />
       </div>
       {selectedSurface && <Link href={scopedUrl(selectedSurface.href)} prefetch={false} className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">{t('Open')} {t(selectedSurface.title)} <span aria-hidden>↗</span></Link>}
+      {/* momorain 官方课程：有学习记录时 LearningWays 不显示，这里单独放入口。
+          没有记录时 LearningWays 里已经带了，避免重复。 */}
+      {kind === 'all' && !query && !loading && all.length > 0 && <OfficialCoursesHome />}
       {failed.length > 0 && (
         <LearningErrorState
           message={t('Some learning activity could not be loaded: {{sources}}.', {

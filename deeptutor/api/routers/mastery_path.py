@@ -274,7 +274,21 @@ class LearnerOverrideRequest(BaseModel):
     note: str = Field(default="", max_length=500)
 
 
+async def _replace_modules(service: LearningService, book_id: str, modules: list[LearningModule]):
+    """Shared by the import/init endpoints; a locked or invalid outline is a 422, not a 500."""
+    try:
+        return await asyncio.to_thread(service.replace_modules_for_path, book_id, modules)
+    except ObjectiveRelationError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 def _topic_sources(items: list[TopicSourceRequest]) -> list[TopicSource]:
+    # Official-course lesson sources are minted only by the enrollment flow,
+    # which binds them to an enrollment record; a client cannot forge one.
+    if any(item.kind == TopicSourceKind.COURSE for item in items):
+        raise HTTPException(
+            status_code=422, detail="course sources can only be created by enrolling"
+        )
     return [
         TopicSource(
             id=item.id.strip() or f"source_{uuid.uuid4().hex}",
@@ -1069,7 +1083,7 @@ async def init_modules(book_id: str, body: InitModulesRequest):
     _validate_runnable_modules(modules)
     async with _exclusive_path_mutation(book_id):
         service = get_learning_service()
-        progress = await asyncio.to_thread(service.replace_modules_for_path, book_id, modules)
+        progress = await _replace_modules(service, book_id, modules)
     return {
         "status": "ok",
         "module_count": len(modules),
@@ -1103,7 +1117,7 @@ async def import_from_book(book_id: str, body: ImportFromBookRequest):
     _validate_runnable_modules(modules)
     async with _exclusive_path_mutation(book_id):
         service = get_learning_service()
-        progress = await asyncio.to_thread(service.replace_modules_for_path, book_id, modules)
+        progress = await _replace_modules(service, book_id, modules)
     return {
         "status": "ok",
         "module_count": len(modules),
@@ -1257,7 +1271,7 @@ async def generate_from_notebook(book_id: str, body: GenerateFromNotebookRequest
     _validate_runnable_modules(modules, status_code=502)
     async with _exclusive_path_mutation(book_id):
         service = get_learning_service()
-        progress = await asyncio.to_thread(service.replace_modules_for_path, book_id, modules)
+        progress = await _replace_modules(service, book_id, modules)
     return {
         "status": "ok",
         "module_count": len(modules),
