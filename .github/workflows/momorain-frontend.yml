@@ -1,6 +1,11 @@
 name: momorain 网页构建
 on:
   workflow_dispatch:
+  # 合并时只要升了版本号就自动构建，不用再手动触发
+  # （手动触发在这个 fork 上报过 422，之前只能绕道 one-api 的备用 workflow 改写死的 SHA）。
+  push:
+    branches: [main]
+    paths: [deploy/momorain/frontend-version.txt]
 permissions:
   contents: write
 concurrency:
@@ -14,30 +19,54 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: false
+      - name: 版本已发布就跳过
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=$(tr -d '\n' < deploy/momorain/frontend-version.txt)
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$TAG 已经发布过，不覆盖；要发新版请先递增 frontend-version.txt"
+          fi
       - uses: actions/setup-node@v4
+        if: steps.tag.outputs.skip != 'true'
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: web/package-lock.json
+      # Next.js 的增量编译缓存：没改的模块直接复用，编译从约 160 秒降下来。
+      - uses: actions/cache@v4
+        if: steps.tag.outputs.skip != 'true'
+        with:
+          path: web/.next/cache
+          key: next-${{ hashFiles('web/package-lock.json') }}-${{ github.sha }}
+          restore-keys: next-${{ hashFiles('web/package-lock.json') }}-
       - name: 安装前端依赖
+        if: steps.tag.outputs.skip != 'true'
         working-directory: web
         run: npm ci --legacy-peer-deps
       - name: 类型与路径测试
+        if: steps.tag.outputs.skip != 'true'
         working-directory: web
         run: |
           npm run typecheck
           npx vitest run tests/momorain-base-path.spec.ts tests/momorain-guest.spec.ts
       - name: 登录草稿真实浏览器回归
+        if: steps.tag.outputs.skip != 'true'
         working-directory: web
         run: |
           if ! command -v google-chrome >/dev/null; then npx playwright install --with-deps chrome; fi
           node scripts/test-login-handoff.cjs
       - name: 编译固定子路径网页
+        if: steps.tag.outputs.skip != 'true'
         working-directory: web
         env:
           NODE_OPTIONS: --max-old-space-size=4096
         run: npm run build
       - name: 打包 Linux x64 产物
+        if: steps.tag.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -45,5 +74,10 @@ jobs:
           TAG=$(cat deploy/momorain/frontend-version.txt | tr -d '\n')
           node -e 'require("fs").writeFileSync("web/.next/standalone/frontend-build.json", JSON.stringify({commit: process.env.GITHUB_SHA, basePath: "/deeptutor", platform: process.platform, arch: process.arch}))'
           tar -czf frontend-linux-x64.tar.gz -C web/.next/standalone .
+          # 同一提交的后端源码也一起发布：服务器组装镜像（deploy/momorain/assemble-app.py）只需从这一个 release 取文件。
+          git archive --format=tar.gz -o source.tar.gz "$GITHUB_SHA" \
+            deeptutor deeptutor_cli packages scripts pyproject.toml build_metadata.py \
+            build_support.py requirements/momorain-linux.lock deploy/momorain
           sha256sum frontend-linux-x64.tar.gz > frontend-linux-x64.tar.gz.sha256
-          gh release create "$TAG" frontend-linux-x64.tar.gz frontend-linux-x64.tar.gz.sha256 --target "$GITHUB_SHA" --title "$TAG" --notes "momorain /deeptutor Linux x64 前端；已通过类型与路径检查。" --latest=false
+          sha256sum source.tar.gz > source.tar.gz.sha256
+          gh release create "$TAG" frontend-linux-x64.tar.gz frontend-linux-x64.tar.gz.sha256 source.tar.gz source.tar.gz.sha256 --target "$GITHUB_SHA" --title "$TAG" --notes "momorain /deeptutor Linux x64 前端；已通过类型与路径检查。" --latest=false
