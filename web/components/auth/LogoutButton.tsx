@@ -17,7 +17,7 @@ export function LogoutButton({ collapsed = false }: LogoutButtonProps) {
   const { t } = useTranslation();
   const { enabled, authenticated } = useAuthStatus();
 
-  // 统一账号的退出操作在顶部昵称链接的账号中心完成；上游按钮调用的是已关闭的本地退出接口。
+  // 统一账号的退出操作在侧栏账号条目（MomorainAccount.tsx）链到的账号中心完成；上游按钮调用的是已关闭的本地退出接口。
   if (MOMORAIN_ENABLED || !enabled || !authenticated) return null;
 
   async function handleLogout() {

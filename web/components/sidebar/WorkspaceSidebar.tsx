@@ -1,6 +1,7 @@
 "use client";
 
 import { isLoginRequired } from "@/lib/momorain-guest";
+import { MomorainAccountItem } from "@/components/MomorainAccount";
 import { activeWorkspaceId, navigateTask } from "@/lib/workspace-scope";
 import { sessionWorkspaceId } from "@/lib/session-api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -245,6 +246,7 @@ export default function WorkspaceSidebar() {
       onOrganizeSession={handleOrganizeSession}
       footerSlot={(collapsed) => (
         <>
+          <MomorainAccountItem collapsed={collapsed} />
           <ProfileLink collapsed={collapsed} />
           <AdminLink collapsed={collapsed} />
           <LogoutButton collapsed={collapsed} />
