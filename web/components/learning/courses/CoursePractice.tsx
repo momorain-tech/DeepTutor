@@ -115,7 +115,7 @@ function QuestionCard({
     try {
       const graded = await submitAnswer(enrollmentId, question.question_id, submissionId, answer())
       setResult(graded)
-      onGraded?.()
+      if (graded.status === 'graded') onGraded?.()
     } catch (err) {
       if (isApiError(err) && err.status === 401) return
       // 保留同一个 submissionId：重试不会重复计分。
@@ -314,11 +314,13 @@ function QuestionCard({
           )}
           <button
             type="button"
-            onClick={again}
-            className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] text-primary hover:underline"
+            // 评分中重试沿用 submissionId；只有真正评完才能新开一次作答。
+            onClick={result.status === 'graded' ? again : submit}
+            disabled={busy}
+            className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] text-primary hover:underline disabled:opacity-50"
           >
             <RotateCcw size={13} aria-hidden="true" />
-            {t('Try again')}
+            {result.status === 'graded' ? t('Try again') : t('Retry submission')}
           </button>
         </div>
       )}

@@ -12,7 +12,7 @@ import type { CourseDetail, CoursePreview, Enrollment } from '@/lib/courses-type
 import { masteryTopicRoute } from '@/lib/learning-routes'
 import { requestLogin } from '@/lib/momorain-guest'
 import { useMomorainPrincipal } from '@/lib/momorain-guest-hooks'
-import { CourseCredits, LessonMarkdown, SourceList, readProgressOf, useMyEnrollments } from './CourseParts'
+import { CourseCredits, CourseTrialNotice, LessonMarkdown, SourceList, readProgressOf, useMyEnrollments } from './CourseParts'
 
 /**
  * /learning/courses/<id>：课程介绍、目录、公开样课、加入/继续学习。
@@ -130,6 +130,7 @@ export function CourseDetailPage({ courseId }: { courseId: string }) {
           ← {t('All official courses')}
         </Link>
       </div>
+      <CourseTrialNotice course={course} />
       {joinError && <LearningErrorState message={joinError} onRetry={join} />}
       {enrollment?.latest_version && (
         <p className="mb-4 rounded-xl bg-amber-500/10 px-4 py-3 text-[12.5px] text-amber-800 dark:text-amber-300">

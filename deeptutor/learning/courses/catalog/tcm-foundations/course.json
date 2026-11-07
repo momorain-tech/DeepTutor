@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "course_id": "tcm-foundations",
+  "versions": {
+    "1.0.0": "published"
+  },
+  "enrollment_open": true,
+  "learning_open": true,
+  "suspended_lessons": [],
+  "errata": []
+}

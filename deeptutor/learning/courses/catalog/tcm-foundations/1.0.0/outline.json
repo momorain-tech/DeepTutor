@@ -1,0 +1,529 @@
+{
+  "units": [
+    {
+      "id": "concept-map",
+      "title": "第一单元 · 建立概念地图",
+      "lessons": [
+        "orientation",
+        "yin-yang-five-phases",
+        "body-language",
+        "symptom-disease-pattern"
+      ]
+    },
+    {
+      "id": "usable-information",
+      "title": "第二单元 · 从日常经验到可用信息",
+      "lessons": [
+        "daily-context",
+        "medicine-safety"
+      ]
+    },
+    {
+      "id": "check-and-communicate",
+      "title": "第三单元 · 能查证，也能表达",
+      "lessons": [
+        "health-information",
+        "consultation-and-review"
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "orientation",
+      "title": "第 1 课 · 从哪里开始学中医",
+      "order": 1,
+      "objectives": [
+        "说明通识学习与个人诊疗的区别",
+        "用例子解释整体观念",
+        "区分理论、观察与疗效主张"
+      ],
+      "material": "lessons/orientation.md",
+      "knowledge_points": [
+        "learning-scope",
+        "whole-view",
+        "claim-types"
+      ],
+      "preview": true,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "yin-yang-five-phases",
+      "title": "第 2 课 · 阴阳五行怎样读",
+      "order": 2,
+      "objectives": [
+        "说明阴阳属性的相对性",
+        "区分阴阳关系的名称与含义",
+        "解释五行模型与疗效证据的区别"
+      ],
+      "material": "lessons/yin-yang-five-phases.md",
+      "knowledge_points": [
+        "yin-yang-relative",
+        "yin-yang-relations",
+        "five-phase-model"
+      ],
+      "preview": false,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "body-language",
+      "title": "第 3 课 · 脏腑、气血津液与经络",
+      "order": 3,
+      "objectives": [
+        "在理论语境中解释脏腑词汇",
+        "区分气、血、津液概念",
+        "说明经络概念与操作技能的区别"
+      ],
+      "material": "lessons/body-language.md",
+      "knowledge_points": [
+        "zang-fu-terms",
+        "qi-blood-fluids",
+        "meridian-overview"
+      ],
+      "preview": false,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "symptom-disease-pattern",
+      "title": "第 4 课 · 病、症、证与四诊",
+      "order": 4,
+      "objectives": [
+        "区分症状描述与证候判断",
+        "识记四诊名称及闻诊范围",
+        "把诊断标签改写为观察和问题"
+      ],
+      "material": "lessons/symptom-disease-pattern.md",
+      "knowledge_points": [
+        "symptom-disease-pattern",
+        "four-examinations",
+        "syndrome-context"
+      ],
+      "preview": false,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "daily-context",
+      "title": "第 5 课 · 起居、饮食与情志",
+      "order": 5,
+      "objectives": [
+        "识别日常记录中的背景因素",
+        "分开记录事实与解释",
+        "写出一个可检查的小安排"
+      ],
+      "material": "lessons/daily-context.md",
+      "knowledge_points": [
+        "daily-factors",
+        "context-log",
+        "small-change-plan"
+      ],
+      "preview": false,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "medicine-safety",
+      "title": "第 6 课 · 中药与产品信息",
+      "order": 6,
+      "objectives": [
+        "解释天然来源为何不等于无风险",
+        "整理准确的产品与用药信息",
+        "为具体用药问题准备专业咨询"
+      ],
+      "material": "lessons/medicine-safety.md",
+      "knowledge_points": [
+        "natural-risk",
+        "medication-list",
+        "professional-help"
+      ],
+      "preview": false,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "health-information",
+      "title": "第 7 课 · 怎样读一条健康信息",
+      "order": 7,
+      "objectives": [
+        "追溯一条说法的原始出处",
+        "找出比较、结果与缺失信息",
+        "写出与证据范围匹配的结论"
+      ],
+      "material": "lessons/health-information.md",
+      "knowledge_points": [
+        "trace-source",
+        "study-comparison",
+        "limited-claim"
+      ],
+      "preview": true,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "consultation-and-review",
+      "title": "第 8 课 · 把知识带进就诊沟通",
+      "order": 8,
+      "objectives": [
+        "用时间线、影响和用药信息组织说明",
+        "辨认课程与个体诊疗的分工",
+        "把概念与查证方法用于新情境"
+      ],
+      "material": "lessons/consultation-and-review.md",
+      "knowledge_points": [
+        "consultation-summary",
+        "boundary-response",
+        "learning-transfer"
+      ],
+      "preview": false,
+      "estimated_minutes": 20
+    }
+  ],
+  "knowledge_points": [
+    {
+      "id": "learning-scope",
+      "name": "明确入门学习的范围",
+      "type": "concept",
+      "prerequisites": [],
+      "sources": [
+        "tcm-education",
+        "tcm-evidence"
+      ],
+      "anchors": [
+        "learning-scope"
+      ]
+    },
+    {
+      "id": "whole-view",
+      "name": "理解整体观念中的联系",
+      "type": "concept",
+      "prerequisites": [],
+      "sources": [
+        "tcm-education"
+      ],
+      "anchors": [
+        "whole-view"
+      ]
+    },
+    {
+      "id": "claim-types",
+      "name": "区分三类健康表述",
+      "type": "concept",
+      "prerequisites": [],
+      "sources": [
+        "tcm-evidence",
+        "research-reading"
+      ],
+      "anchors": [
+        "claim-types"
+      ]
+    },
+    {
+      "id": "yin-yang-relative",
+      "name": "阴阳属性与比较语境",
+      "type": "concept",
+      "prerequisites": [
+        "learning-scope"
+      ],
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "anchors": [
+        "relative-properties"
+      ]
+    },
+    {
+      "id": "yin-yang-relations",
+      "name": "阴阳关系的基础名称",
+      "type": "memory",
+      "prerequisites": [
+        "yin-yang-relative"
+      ],
+      "sources": [
+        "bucm-theory"
+      ],
+      "anchors": [
+        "yin-yang-relations"
+      ]
+    },
+    {
+      "id": "five-phase-model",
+      "name": "五行分类与关系模型",
+      "type": "concept",
+      "prerequisites": [
+        "claim-types"
+      ],
+      "sources": [
+        "bucm-theory",
+        "bucm-exam-2025"
+      ],
+      "anchors": [
+        "five-phases"
+      ]
+    },
+    {
+      "id": "zang-fu-terms",
+      "name": "脏腑术语的功能语境",
+      "type": "concept",
+      "prerequisites": [
+        "whole-view"
+      ],
+      "sources": [
+        "ahtcm-zangxiang",
+        "bucm-theory"
+      ],
+      "anchors": [
+        "zang-fu"
+      ]
+    },
+    {
+      "id": "qi-blood-fluids",
+      "name": "气血津液的概念区分",
+      "type": "concept",
+      "prerequisites": [
+        "zang-fu-terms"
+      ],
+      "sources": [
+        "bucm-qi-blood"
+      ],
+      "anchors": [
+        "qi-blood-fluids"
+      ]
+    },
+    {
+      "id": "meridian-overview",
+      "name": "经络在理论中的位置",
+      "type": "concept",
+      "prerequisites": [
+        "whole-view"
+      ],
+      "sources": [
+        "bucm-theory",
+        "bucm-qi-blood"
+      ],
+      "anchors": [
+        "meridians"
+      ]
+    },
+    {
+      "id": "symptom-disease-pattern",
+      "name": "区分病、症、证",
+      "type": "concept",
+      "prerequisites": [
+        "claim-types"
+      ],
+      "sources": [
+        "tcm-education",
+        "bucm-exam-2025"
+      ],
+      "anchors": [
+        "three-levels"
+      ]
+    },
+    {
+      "id": "four-examinations",
+      "name": "四诊名称与信息范围",
+      "type": "memory",
+      "prerequisites": [
+        "symptom-disease-pattern"
+      ],
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "anchors": [
+        "four-examinations"
+      ]
+    },
+    {
+      "id": "syndrome-context",
+      "name": "辨证需要综合背景",
+      "type": "concept",
+      "prerequisites": [
+        "symptom-disease-pattern",
+        "whole-view"
+      ],
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "anchors": [
+        "context-before-label"
+      ]
+    },
+    {
+      "id": "daily-factors",
+      "name": "日常生活的背景因素",
+      "type": "memory",
+      "prerequisites": [
+        "whole-view"
+      ],
+      "sources": [
+        "tcm-education",
+        "health-literacy-2024"
+      ],
+      "anchors": [
+        "daily-factors"
+      ]
+    },
+    {
+      "id": "context-log",
+      "name": "区分生活记录中的事实与推断",
+      "type": "procedure",
+      "prerequisites": [
+        "claim-types",
+        "daily-factors"
+      ],
+      "sources": [
+        "research-reading",
+        "health-literacy-2024"
+      ],
+      "anchors": [
+        "context-log"
+      ]
+    },
+    {
+      "id": "small-change-plan",
+      "name": "设计可执行的小安排",
+      "type": "design",
+      "prerequisites": [
+        "context-log"
+      ],
+      "sources": [
+        "health-literacy-2024"
+      ],
+      "anchors": [
+        "small-plan"
+      ]
+    },
+    {
+      "id": "natural-risk",
+      "name": "产品来源与风险的区别",
+      "type": "concept",
+      "prerequisites": [
+        "claim-types"
+      ],
+      "sources": [
+        "herbal-adverse"
+      ],
+      "anchors": [
+        "natural-and-risk"
+      ]
+    },
+    {
+      "id": "medication-list",
+      "name": "整理完整的用药沟通卡",
+      "type": "procedure",
+      "prerequisites": [
+        "natural-risk"
+      ],
+      "sources": [
+        "herbal-safe",
+        "herbal-adverse"
+      ],
+      "anchors": [
+        "medication-card"
+      ]
+    },
+    {
+      "id": "professional-help",
+      "name": "把个体用药问题交给专业评估",
+      "type": "concept",
+      "prerequisites": [
+        "learning-scope",
+        "medication-list"
+      ],
+      "sources": [
+        "herbal-safe"
+      ],
+      "anchors": [
+        "professional-consultation"
+      ]
+    },
+    {
+      "id": "trace-source",
+      "name": "追溯健康说法的出处",
+      "type": "procedure",
+      "prerequisites": [
+        "claim-types"
+      ],
+      "sources": [
+        "research-reading"
+      ],
+      "anchors": [
+        "trace-source"
+      ]
+    },
+    {
+      "id": "study-comparison",
+      "name": "理解比较与因果判断",
+      "type": "concept",
+      "prerequisites": [
+        "trace-source"
+      ],
+      "sources": [
+        "research-reading",
+        "tcm-evidence"
+      ],
+      "anchors": [
+        "study-comparison"
+      ]
+    },
+    {
+      "id": "limited-claim",
+      "name": "写出有边界的健康结论",
+      "type": "design",
+      "prerequisites": [
+        "study-comparison"
+      ],
+      "sources": [
+        "tcm-evidence"
+      ],
+      "anchors": [
+        "limited-conclusion"
+      ]
+    },
+    {
+      "id": "consultation-summary",
+      "name": "组织简明的就诊说明",
+      "type": "procedure",
+      "prerequisites": [
+        "context-log",
+        "medication-list"
+      ],
+      "sources": [
+        "health-literacy-2024",
+        "herbal-safe"
+      ],
+      "anchors": [
+        "consultation-summary"
+      ]
+    },
+    {
+      "id": "boundary-response",
+      "name": "恰当回应个体诊疗请求",
+      "type": "concept",
+      "prerequisites": [
+        "syndrome-context",
+        "professional-help"
+      ],
+      "sources": [
+        "health-literacy-2024",
+        "herbal-safe"
+      ],
+      "anchors": [
+        "respond-to-boundaries"
+      ]
+    },
+    {
+      "id": "learning-transfer",
+      "name": "把概念与查证方法迁移到新说法",
+      "type": "design",
+      "prerequisites": [
+        "five-phase-model",
+        "limited-claim",
+        "consultation-summary"
+      ],
+      "sources": [
+        "research-reading",
+        "tcm-evidence",
+        "herbal-safe"
+      ],
+      "anchors": [
+        "learning-transfer"
+      ]
+    }
+  ]
+}

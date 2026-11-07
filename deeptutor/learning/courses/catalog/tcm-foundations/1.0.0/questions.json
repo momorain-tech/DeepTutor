@@ -1,0 +1,1681 @@
+{
+  "questions": [
+    {
+      "id": "learning-scope-purpose",
+      "version": 1,
+      "lesson": "orientation",
+      "knowledge_point": "learning-scope",
+      "type": "single_choice",
+      "prompt": "哪项最符合本课程第一阶段的学习目标？",
+      "explanation": "解释概念、识别未知项属于通识能力；个人诊疗不是本课产出。",
+      "sources": [
+        "tcm-education",
+        "tcm-evidence"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "凭一张照片确认家人的疾病"
+        },
+        {
+          "label": "B",
+          "body": "背完词汇就独立开方"
+        },
+        {
+          "label": "C",
+          "body": "解释术语并说出还缺哪些判断资料"
+        },
+        {
+          "label": "D",
+          "body": "替别人决定停用原处方"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "learning-scope-goal",
+      "version": 1,
+      "lesson": "orientation",
+      "knowledge_point": "learning-scope",
+      "type": "open",
+      "prompt": "写一个零基础学习者能在本课程中展示的学习目标，并说明它与个人诊疗任务的区别。",
+      "explanation": "目标可以有不同形式，关键是可展示且不把概念学习当作诊疗资格。",
+      "sources": [
+        "tcm-education",
+        "tcm-evidence"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "目标具体到可展示的解释、查证或沟通结果",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "说明课程任务不构成个人诊断或处方能力",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "给出一项需要进一步学习或专业判断的未知内容",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "我想准确解释阴阳的比较语境，并列出一个不能由它直接推出的疗效结论。能解释词义不等于能给人诊断；某种方法是否适合具体病人仍需专业评估。"
+      }
+    },
+    {
+      "id": "whole-view-context",
+      "version": 1,
+      "lesson": "orientation",
+      "knowledge_point": "whole-view",
+      "type": "single_choice",
+      "prompt": "用整体观念理解“小林最近白天困”，哪项做法更恰当？",
+      "explanation": "整体观念提醒补充联系和背景，不会自动给出唯一病因。",
+      "sources": [
+        "tcm-education"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "补充作息、工作、身体和用药背景，再区分已知与未知"
+        },
+        {
+          "label": "B",
+          "body": "立刻认定所有困倦都来自同一原因"
+        },
+        {
+          "label": "C",
+          "body": "只给“困”换一个专业词"
+        },
+        {
+          "label": "D",
+          "body": "只看一个外观特征就作结论"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A"
+        ]
+      }
+    },
+    {
+      "id": "whole-view-explain",
+      "version": 1,
+      "lesson": "orientation",
+      "knowledge_point": "whole-view",
+      "type": "open",
+      "prompt": "有人说“既然要整体看，所有不舒服一定是同一处出了问题”。请指出这句话的推理问题，并列出两个可补充的背景。",
+      "explanation": "评的是关系与因果的区分，不要求指定某个病因。",
+      "sources": [
+        "tcm-education"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "说明存在联系不等于只有同一个原因",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "列出至少两个相关背景，如作息、环境、身体变化或用药",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "承认背景资料本身还不能确定个体病因",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "联系不等于唯一原因。可以补充近期作息与用药变化，但这些资料还需要进一步分析，不能据此直接给小林下诊断。"
+      }
+    },
+    {
+      "id": "claim-types-sort",
+      "version": 1,
+      "lesson": "orientation",
+      "knowledge_point": "claim-types",
+      "type": "multiple_choice",
+      "prompt": "哪些句子已经提出疗效主张？（多选）",
+      "explanation": "B、D 在断言健康干预的效果；A 是观察记录，C 是对理论内容的描述。",
+      "sources": [
+        "tcm-evidence",
+        "research-reading"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "我昨晚十点入睡"
+        },
+        {
+          "label": "B",
+          "body": "某方法能治疗所有人的失眠"
+        },
+        {
+          "label": "C",
+          "body": "教材讨论阴阳相对性"
+        },
+        {
+          "label": "D",
+          "body": "某产品可以改善某种疾病"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "B",
+          "D"
+        ]
+      }
+    },
+    {
+      "id": "claim-types-layers",
+      "version": 1,
+      "lesson": "orientation",
+      "knowledge_point": "claim-types",
+      "type": "open",
+      "prompt": "把“我喝了某茶后感觉睡得好，所以这种茶能治疗所有人的睡眠问题”拆成观察与疗效结论，并说出缺少的一类证据。",
+      "explanation": "可用等价表达；不需要也不应猜茶的配方。",
+      "sources": [
+        "tcm-evidence",
+        "research-reading"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "准确指出单次个人感受这一观察",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "指出对所有人或治疗效果的推广属于额外结论",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "提出比较研究、人群适用性或风险资料等缺失信息",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "喝茶后的一次感受是观察；能治疗所有人的说法是超出观察的推广。还需核对具体产品、对照研究和人群及风险信息。"
+      }
+    },
+    {
+      "id": "yin-yang-relative-reference",
+      "version": 1,
+      "lesson": "yin-yang-five-phases",
+      "knowledge_point": "yin-yang-relative",
+      "type": "single_choice",
+      "prompt": "讨论某个现象的阴阳属性，首先应明确什么？",
+      "explanation": "相对属性需要说明相关方面和比较条件。",
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "某个人永远属于哪一类"
+        },
+        {
+          "label": "B",
+          "body": "某种食物的疗效"
+        },
+        {
+          "label": "C",
+          "body": "一个固定的阴阳数值"
+        },
+        {
+          "label": "D",
+          "body": "比较的方面和参照条件"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "D"
+        ]
+      }
+    },
+    {
+      "id": "yin-yang-relative-explain",
+      "version": 1,
+      "lesson": "yin-yang-five-phases",
+      "knowledge_point": "yin-yang-relative",
+      "type": "open",
+      "prompt": "用一个不涉及诊疗的例子说明“相对而言”，再指出换了参照条件为什么需要重新说明。",
+      "explanation": "类比用于解释相对性，不作为人体机制或疗效证据。",
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "给出明确的相关对象或同一对象的两个方面",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "说清比较维度或参照条件",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "说明属性分析不能脱离语境固定不变",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "同一天比较向阳面和背阴面的光照时，参照条件是相同时间下的光照差异。换成一天中不同时间的比较，就需要重新说明条件，不能照搬原来的标签。"
+      }
+    },
+    {
+      "id": "yin-yang-relations-change",
+      "version": 1,
+      "lesson": "yin-yang-five-phases",
+      "knowledge_point": "yin-yang-relations",
+      "type": "single_choice",
+      "prompt": "教材中“消长”和“转化”的区别，哪项表述恰当？",
+      "explanation": "本课按关系的含义区分这两个名称，不能只背词而混用。",
+      "sources": [
+        "bucm-theory"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "是两个完全相同的词"
+        },
+        {
+          "label": "B",
+          "body": "消长侧重变化，转化强调一定条件下性质发生转变"
+        },
+        {
+          "label": "C",
+          "body": "消长只指固定不变"
+        },
+        {
+          "label": "D",
+          "body": "转化不需要任何条件"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "B"
+        ]
+      }
+    },
+    {
+      "id": "yin-yang-relations-names",
+      "version": 1,
+      "lesson": "yin-yang-five-phases",
+      "knowledge_point": "yin-yang-relations",
+      "type": "multiple_choice",
+      "prompt": "哪些属于本课介绍的阴阳关系名称？（多选）",
+      "explanation": "前三项是关系名称，剂量不是阴阳关系的名称。",
+      "sources": [
+        "bucm-theory"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "对立制约"
+        },
+        {
+          "label": "B",
+          "body": "互根互用"
+        },
+        {
+          "label": "C",
+          "body": "消长平衡"
+        },
+        {
+          "label": "D",
+          "body": "人人适用的固定剂量"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "five-phase-model-materials",
+      "version": 1,
+      "lesson": "yin-yang-five-phases",
+      "knowledge_point": "five-phase-model",
+      "type": "single_choice",
+      "prompt": "怎样理解五行中的木、火、土、金、水？",
+      "explanation": "五行模型的名称不能简单当作材料成分表，也不能直接推出疗效。",
+      "sources": [
+        "bucm-theory",
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "它们就是五种化学元素"
+        },
+        {
+          "label": "B",
+          "body": "它们直接决定个人处方"
+        },
+        {
+          "label": "C",
+          "body": "它们是传统归类与关系模型使用的名称"
+        },
+        {
+          "label": "D",
+          "body": "它们说明所有同色食物疗效相同"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "five-phase-model-inference",
+      "version": 1,
+      "lesson": "yin-yang-five-phases",
+      "knowledge_point": "five-phase-model",
+      "type": "open",
+      "prompt": "一条广告称“某食品颜色对应某行，所以能治疗相应脏腑的疾病”。请说明它从什么跳到了什么，以及还需核对哪类问题。",
+      "explanation": "不要求否定所有传统理论，要求识别这一步推论所缺的依据。",
+      "sources": [
+        "bucm-theory",
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "区分传统分类或对应关系与疗效主张",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "明确指出分类关系不能直接推出治疗效果",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "指出需要对具体食品、疾病、人群、比较或风险另行核查",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "它从理论归类跳到了具体疗效。对应关系本身不足以证明治疗效果，还需核查具体干预针对什么疾病和人群，以及研究和风险资料。"
+      }
+    },
+    {
+      "id": "zang-fu-terms-meaning",
+      "version": 1,
+      "lesson": "body-language",
+      "knowledge_point": "zang-fu-terms",
+      "type": "single_choice",
+      "prompt": "读中医教材里的脏腑名称，哪项更准确？",
+      "explanation": "同名并不意味着概念范围完全相同，需结合教材语境。",
+      "sources": [
+        "ahtcm-zangxiang",
+        "bucm-theory"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "结合功能、表现与联系理解术语语境"
+        },
+        {
+          "label": "B",
+          "body": "看到“脾”就等于知道脾脏影像结果"
+        },
+        {
+          "label": "C",
+          "body": "只看名称，不必看上下文"
+        },
+        {
+          "label": "D",
+          "body": "所有同名词在各种医学体系中完全等义"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A"
+        ]
+      }
+    },
+    {
+      "id": "zang-fu-terms-explain",
+      "version": 1,
+      "lesson": "body-language",
+      "knowledge_point": "zang-fu-terms",
+      "type": "open",
+      "prompt": "为什么不能只因一段中医文字出现“脾”，就推定某项现代器官检查异常？",
+      "explanation": "回答应区分概念范围，不要求推断某个疾病。",
+      "sources": [
+        "ahtcm-zangxiang",
+        "bucm-theory"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "说明脏腑术语涉及传统功能和联系的语境",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "区分术语理解与现代检查所得的信息",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "指出具体异常需要相应资料与专业评估",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "脏腑术语需要放在功能和联系的语境中理解，文字提到“脾”并没有提供器官检查结果。具体是否异常还需要对应检查和专业评估。"
+      }
+    },
+    {
+      "id": "qi-blood-fluids-cards",
+      "version": 1,
+      "lesson": "body-language",
+      "knowledge_point": "qi-blood-fluids",
+      "type": "multiple_choice",
+      "prompt": "哪些词卡写法符合本课？（多选）",
+      "explanation": "A、D 保留了概念语境；B、C 把传统概念与单一现代对象机械等同。",
+      "sources": [
+        "bucm-qi-blood"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "津液：传统理论中正常水液的概念"
+        },
+        {
+          "label": "B",
+          "body": "气：完全等于吸入的空气"
+        },
+        {
+          "label": "C",
+          "body": "血：相关表述都能直接替换为一个血常规数值"
+        },
+        {
+          "label": "D",
+          "body": "气、血、津液相互联系，但概念不能直接互换"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A",
+          "D"
+        ]
+      }
+    },
+    {
+      "id": "qi-blood-fluids-distinguish",
+      "version": 1,
+      "lesson": "body-language",
+      "knowledge_point": "qi-blood-fluids",
+      "type": "open",
+      "prompt": "任选气、血、津液中的两个，分别写一句概念范围，并说明为什么不能给它们制作简单的一项检验值替换表。",
+      "explanation": "接受符合教材范围的简明解释，不以背诵完整专业定义作为门槛。",
+      "sources": [
+        "bucm-qi-blood"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "分别说明所选两个概念在教材中的基本范围",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "说明两者有联系但不是同义词",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "指出传统概念与现代指标不能未经论证一对一替换",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "血在本课中与濡养等功能相关，津液指正常水液。两者在理论上联系但并非同义词，也不能把各自全部含义缩成单一检验数值。"
+      }
+    },
+    {
+      "id": "meridian-overview-equivalence",
+      "version": 1,
+      "lesson": "body-language",
+      "knowledge_point": "meridian-overview",
+      "type": "true_false",
+      "prompt": "经络就是血管或神经网络的另一个名称。",
+      "explanation": "不同理论概念不能省略解释就直接改名替换。",
+      "sources": [
+        "bucm-theory",
+        "bucm-qi-blood"
+      ],
+      "difficulty": "medium",
+      "answer": {
+        "value": false
+      }
+    },
+    {
+      "id": "meridian-overview-scope",
+      "version": 1,
+      "lesson": "body-language",
+      "knowledge_point": "meridian-overview",
+      "type": "open",
+      "prompt": "说明经络在本课词汇地图中的位置，并解释“知道这个词”与“掌握针刺操作”有什么不同。",
+      "explanation": "概念范围与操作能力分开说明即可，不考穴位或技术参数。",
+      "sources": [
+        "bucm-theory",
+        "bucm-qi-blood"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "说明经络学说讨论联系脏腑、肢节等的系统",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "不将它简单等同血管或神经网络",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "说明术语识读不代表已获得定位、针刺等操作技能",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "经络是基础理论中讨论联系系统的一组概念，不能直接替换为血管或神经名称。理解术语尚未学习或掌握具体技术，更不意味着可以自行针刺。"
+      }
+    },
+    {
+      "id": "symptom-disease-pattern-levels",
+      "version": 1,
+      "lesson": "symptom-disease-pattern",
+      "knowledge_point": "symptom-disease-pattern",
+      "type": "single_choice",
+      "prompt": "关于病、症、证，哪项符合本课？",
+      "explanation": "证候判断需要综合资料，不是症状的直接改名。",
+      "sources": [
+        "tcm-education",
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "三个字在任何情况下都是同义词"
+        },
+        {
+          "label": "B",
+          "body": "一个症状就是一个完整证候"
+        },
+        {
+          "label": "C",
+          "body": "证只能由一个外观特征确认"
+        },
+        {
+          "label": "D",
+          "body": "证是对疾病过程中一定阶段病理状态的概括"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "D"
+        ]
+      }
+    },
+    {
+      "id": "symptom-disease-pattern-gap",
+      "version": 1,
+      "lesson": "symptom-disease-pattern",
+      "knowledge_point": "symptom-disease-pattern",
+      "type": "open",
+      "prompt": "“我这周几次胃部不适，因此一定属于某证。”这句话的观察部分是什么，推断部分是什么，中间缺少什么？",
+      "explanation": "识别判断层次，不要求对案例作诊断。",
+      "sources": [
+        "tcm-education",
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "指出胃部不适及时间频次是观察描述",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "指出确定某证是另外的判断而非观察本身",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "说明需要更多具体资料和专业综合分析，而不自行给出证名",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "几次胃部不适是描述；“一定某证”是推断。还需了解具体表现和变化过程并由专业人员综合判断，不能仅凭这句描述定证。"
+      }
+    },
+    {
+      "id": "four-examinations-names",
+      "version": 1,
+      "lesson": "symptom-disease-pattern",
+      "knowledge_point": "four-examinations",
+      "type": "fill_blank",
+      "prompt": "按教材顺序填写四诊的四个字：____。",
+      "explanation": "四诊名称为望、闻、问、切。",
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "difficulty": "easy",
+      "answer": {
+        "accepted": [
+          "望闻问切"
+        ]
+      }
+    },
+    {
+      "id": "four-examinations-hearing",
+      "version": 1,
+      "lesson": "symptom-disease-pattern",
+      "knowledge_point": "four-examinations",
+      "type": "single_choice",
+      "prompt": "本课所说的“闻诊”，哪项准确？",
+      "explanation": "不能仅按日常语言里“闻”的某一层意思理解术语。",
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "只闻气味，不听声音"
+        },
+        {
+          "label": "B",
+          "body": "包含听声音和嗅气味等内容"
+        },
+        {
+          "label": "C",
+          "body": "等于观看一张照片"
+        },
+        {
+          "label": "D",
+          "body": "完全不涉及信息收集"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "B"
+        ]
+      }
+    },
+    {
+      "id": "syndrome-context-rewrite",
+      "version": 1,
+      "lesson": "symptom-disease-pattern",
+      "knowledge_point": "syndrome-context",
+      "type": "single_choice",
+      "prompt": "怎样改写“我肯定是某证，要马上买药”更适合就医沟通？",
+      "explanation": "改写保留可核对的事实和问题，避免把未确认的判断当作用药依据。",
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "只换成另一个证名"
+        },
+        {
+          "label": "B",
+          "body": "删除所有时间信息"
+        },
+        {
+          "label": "C",
+          "body": "列出表现、时间和变化，说明想请医生确认的问题"
+        },
+        {
+          "label": "D",
+          "body": "找一个同样不舒服的人照用其处方"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "syndrome-context-relationship",
+      "version": 1,
+      "lesson": "symptom-disease-pattern",
+      "knowledge_point": "syndrome-context",
+      "type": "open",
+      "prompt": "简述辨证与论治的关系，并解释为什么知道某个疾病名称仍不等于可以自行选择用药。",
+      "explanation": "用自己的话说明逻辑关系即可，不要求给出临床方案。",
+      "sources": [
+        "bucm-exam-2025"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "说明辨证是综合分析资料形成相应判断",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "说明论治在判断基础上讨论治疗",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "指出疾病名称与个人证候、具体用药不能机械一一对应，不代案例开药",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "辨证对资料作综合判断，论治再据相应判断讨论治疗。一个疾病名称不足以包含个人的全部背景和证候信息，不能据名称自行选药。"
+      }
+    },
+    {
+      "id": "daily-factors-factors",
+      "version": 1,
+      "lesson": "daily-context",
+      "knowledge_point": "daily-factors",
+      "type": "multiple_choice",
+      "prompt": "哪些可以作为日常背景信息？（多选）",
+      "explanation": "背景信息可以记录；未经确认的标签不应冒充已经核实的原因。",
+      "sources": [
+        "tcm-education",
+        "health-literacy-2024"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "作息的改变"
+        },
+        {
+          "label": "B",
+          "body": "近期工作环境的变化"
+        },
+        {
+          "label": "C",
+          "body": "饮食与活动安排"
+        },
+        {
+          "label": "D",
+          "body": "一个未经确认的证型直接充当病因"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "daily-factors-recall",
+      "version": 1,
+      "lesson": "daily-context",
+      "knowledge_point": "daily-factors",
+      "type": "fill_blank",
+      "prompt": "本课列出的四个日常讨论方面是：情志、饮食、____、运动。",
+      "explanation": "起居与其他三个方面一起帮助组织日常生活背景。",
+      "sources": [
+        "tcm-education",
+        "health-literacy-2024"
+      ],
+      "difficulty": "easy",
+      "answer": {
+        "accepted": [
+          "起居"
+        ]
+      }
+    },
+    {
+      "id": "context-log-fact",
+      "version": 1,
+      "lesson": "daily-context",
+      "knowledge_point": "context-log",
+      "type": "single_choice",
+      "prompt": "哪句最接近一条观察记录？",
+      "explanation": "正确选项记录了时间与感受，没有把同时或先后发生的事情直接确认为因果。",
+      "sources": [
+        "research-reading",
+        "health-literacy-2024"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "昨晚比平时晚睡两小时，今天午后感觉困"
+        },
+        {
+          "label": "B",
+          "body": "晚睡必然导致所有困倦"
+        },
+        {
+          "label": "C",
+          "body": "我已经确定了病因"
+        },
+        {
+          "label": "D",
+          "body": "第三天精神些，所以某产品治好了我"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A"
+        ]
+      }
+    },
+    {
+      "id": "context-log-fields",
+      "version": 1,
+      "lesson": "daily-context",
+      "knowledge_point": "context-log",
+      "type": "multiple_choice",
+      "prompt": "一份帮助沟通的记录应怎样写？（多选）",
+      "explanation": "事实、未知与解释分开更便于核对；不应为填表而猜测专业结论。",
+      "sources": [
+        "research-reading",
+        "health-literacy-2024"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "写发生时间与变化情况"
+        },
+        {
+          "label": "B",
+          "body": "把不知道的内容如实标为未知"
+        },
+        {
+          "label": "C",
+          "body": "将解释和观察分开"
+        },
+        {
+          "label": "D",
+          "body": "为显得专业而猜测脉象和证型"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "small-change-plan-specific",
+      "version": 1,
+      "lesson": "daily-context",
+      "knowledge_point": "small-change-plan",
+      "type": "single_choice",
+      "prompt": "哪个更适合作为本课的小安排？",
+      "explanation": "具体的三天安排包含行为、完成记录和回看时间，没有把计划包装成治疗试验。",
+      "sources": [
+        "health-literacy-2024"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "从明天起彻底改变一切"
+        },
+        {
+          "label": "B",
+          "body": "自行改变处方以验证体质"
+        },
+        {
+          "label": "C",
+          "body": "保证三天治好一个健康问题"
+        },
+        {
+          "label": "D",
+          "body": "连续三天在晚间安排次日待办，记录是否完成并回看"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "D"
+        ]
+      }
+    },
+    {
+      "id": "small-change-plan-design",
+      "version": 1,
+      "lesson": "daily-context",
+      "knowledge_point": "small-change-plan",
+      "type": "open",
+      "prompt": "为一个虚构人物写一个三天内可回看的日常安排。说明做什么、怎样记录、何时回看，以及不能由完成情况推出什么。",
+      "explanation": "可设计其他一般日常安排，不要求复制教材例子。",
+      "sources": [
+        "health-literacy-2024"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "计划包含具体可执行行为且不涉及自行调整治疗或用药",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "说明完成记录方式和回看时间",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "说明完成计划不等于证明治病或某种健康因果",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "三天里每天晚间写次日待办，并用勾选记录是否完成，第三天回看安排是否可执行。完成情况只说明这个行为有没有落实，不能证明某病被治好。"
+      }
+    },
+    {
+      "id": "natural-risk-natural",
+      "version": 1,
+      "lesson": "medicine-safety",
+      "knowledge_point": "natural-risk",
+      "type": "single_choice",
+      "prompt": "对“纯天然，所以没有副作用”，哪项分析恰当？",
+      "explanation": "产品来源不能单独证明个体适用性或无风险。",
+      "sources": [
+        "herbal-adverse"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "来源天然已经足以证明安全"
+        },
+        {
+          "label": "B",
+          "body": "来源说明与安全保证是两个不同主张"
+        },
+        {
+          "label": "C",
+          "body": "只要多人用过就无需核对"
+        },
+        {
+          "label": "D",
+          "body": "天然产品都必定有相同风险"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "B"
+        ]
+      }
+    },
+    {
+      "id": "natural-risk-explain",
+      "version": 1,
+      "lesson": "medicine-safety",
+      "knowledge_point": "natural-risk",
+      "type": "open",
+      "prompt": "用两三句话解释为什么“天然”与“人人适用”之间不能直接画等号，并列出两项需要核对的因素。",
+      "explanation": "评的是推理与核查范围，不要求判断某种药的安全性。",
+      "sources": [
+        "herbal-adverse"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "明确来源与安全性、适用性是不同问题",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "列出至少两项相关因素，如成分、质量、使用方式或个体情况",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "不作所有产品一概安全或一概危险的断言",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "天然说明来源，不说明每个人都适用。还需核对具体成分、质量和个人情况，风险应针对具体产品讨论，不能作一概保证。"
+      }
+    },
+    {
+      "id": "medication-list-contents",
+      "version": 1,
+      "lesson": "medicine-safety",
+      "knowledge_point": "medication-list",
+      "type": "multiple_choice",
+      "prompt": "用药沟通卡应尽量包括哪些信息？（多选）",
+      "explanation": "准确身份、其他用品与个人背景便于专业核对，笼统标签不能替代这些信息。",
+      "sources": [
+        "herbal-safe",
+        "herbal-adverse"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "准确名称与可获得的包装说明"
+        },
+        {
+          "label": "B",
+          "body": "正在使用的其他药品和补充剂"
+        },
+        {
+          "label": "C",
+          "body": "已知过敏、反应和相关个人背景"
+        },
+        {
+          "label": "D",
+          "body": "仅写“我吃的是天然的”，省略具体名称"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "medication-list-unknown",
+      "version": 1,
+      "lesson": "medicine-safety",
+      "knowledge_point": "medication-list",
+      "type": "single_choice",
+      "prompt": "朋友送来一包成分不明的“调理粉”，整理信息时哪项合适？",
+      "explanation": "对未知信息如实标注，不用猜测填补资料缺口。",
+      "sources": [
+        "herbal-safe",
+        "herbal-adverse"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "猜一个药名填上"
+        },
+        {
+          "label": "B",
+          "body": "按颜色猜适用人群"
+        },
+        {
+          "label": "C",
+          "body": "注明成分未知，保留包装并向专业人员确认"
+        },
+        {
+          "label": "D",
+          "body": "因为朋友使用过就无需核查"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "professional-help-questions",
+      "version": 1,
+      "lesson": "medicine-safety",
+      "knowledge_point": "professional-help",
+      "type": "single_choice",
+      "prompt": "哪种做法更适合讨论个人用药？",
+      "explanation": "个人用药需要具体资料和专业判断，不能由广告或他人经验替代。",
+      "sources": [
+        "herbal-safe"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "带准确产品与用药清单向有资质的医师或药师咨询"
+        },
+        {
+          "label": "B",
+          "body": "照搬他人的处方"
+        },
+        {
+          "label": "C",
+          "body": "仅凭广告自行停止已有治疗"
+        },
+        {
+          "label": "D",
+          "body": "觉得熟悉就自行决定长期服用"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A"
+        ]
+      }
+    },
+    {
+      "id": "professional-help-ask",
+      "version": 1,
+      "lesson": "medicine-safety",
+      "knowledge_point": "professional-help",
+      "type": "open",
+      "prompt": "为成分尚未核清的虚构产品写一句咨询问题，并说明咨询前应准备什么、暂时不能假定什么。",
+      "explanation": "提问可以有不同措辞，重点是资料明确和不把猜测当结论。",
+      "sources": [
+        "herbal-safe"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "问题指向具体产品与个人用药安全或适用性",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "提出准备包装、实际使用和其他用药等资料",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "承认资料不足，不假定产品安全有效或据此自行停换药",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "我想请您核对这个产品的成分及是否适合与现有用药一起讨论。我会带包装、实际使用记录和其他药品清单；成分不清时不能先认定安全，也不据此自行换药。"
+      }
+    },
+    {
+      "id": "trace-source-first",
+      "version": 1,
+      "lesson": "health-information",
+      "knowledge_point": "trace-source",
+      "type": "single_choice",
+      "prompt": "“专家都说有用”的帖子没有链接，首先可以做什么？",
+      "explanation": "回到可核对的出处，才能判断原文究竟说了什么。",
+      "sources": [
+        "research-reading"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "记录转发数当作证据"
+        },
+        {
+          "label": "B",
+          "body": "只看配图的白大褂"
+        },
+        {
+          "label": "C",
+          "body": "把“专家”换成“权威”再转发"
+        },
+        {
+          "label": "D",
+          "body": "查作者、原始页面或研究及发布时间"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "D"
+        ]
+      }
+    },
+    {
+      "id": "trace-source-check",
+      "version": 1,
+      "lesson": "health-information",
+      "knowledge_point": "trace-source",
+      "type": "multiple_choice",
+      "prompt": "核查一条健康说法，哪些信息有帮助？（多选）",
+      "explanation": "来源、时间与利益背景有助核对；利益关系需要注意，但不替代具体证据分析。",
+      "sources": [
+        "research-reading"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "作者与发布时间"
+        },
+        {
+          "label": "B",
+          "body": "可以回看的原始来源"
+        },
+        {
+          "label": "C",
+          "body": "发布者是否销售相关产品"
+        },
+        {
+          "label": "D",
+          "body": "只要销售产品就不必再读任何证据"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "study-comparison-comparison",
+      "version": 1,
+      "lesson": "health-information",
+      "knowledge_point": "study-comparison",
+      "type": "single_choice",
+      "prompt": "“十位使用者一个月后感觉更轻松”，单凭这句话还不能确认什么？",
+      "explanation": "缺乏比较与其他背景，不能仅凭前后体验确认变化由该方法造成。",
+      "sources": [
+        "research-reading",
+        "tcm-evidence"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "这些人报告了某种感受"
+        },
+        {
+          "label": "B",
+          "body": "该方法一定造成了变化"
+        },
+        {
+          "label": "C",
+          "body": "帖子包含一个时间范围"
+        },
+        {
+          "label": "D",
+          "body": "有必要继续看研究怎么做"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "B"
+        ]
+      }
+    },
+    {
+      "id": "study-comparison-limits",
+      "version": 1,
+      "lesson": "health-information",
+      "knowledge_point": "study-comparison",
+      "type": "open",
+      "prompt": "为什么“有人用后觉得好”尚不足以确认因果？请提出一个比较问题和一个背景问题。",
+      "explanation": "不用提出自行停药或试药的实验，回答停留在研究阅读层面。",
+      "sources": [
+        "research-reading",
+        "tcm-evidence"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "指出个人体验或先后发生不足以单独确认原因",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "提出未使用者或其他合适比较的问题",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "提出其他变化、自然波动、观察时长或人群背景等问题",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "感受发生在使用之后，不代表一定由它造成。需要了解合适比较组的情况，也要看同期是否改变作息、用药，或存在自然波动。"
+      }
+    },
+    {
+      "id": "limited-claim-generalize",
+      "version": 1,
+      "lesson": "health-information",
+      "knowledge_point": "limited-claim",
+      "type": "true_false",
+      "prompt": "只要一项研究涉及某方法的一个用途，就能说明这一类方法对所有健康问题都有效。",
+      "explanation": "方法、用途、人群和结果有范围，不能把一个研究无限推广。",
+      "sources": [
+        "tcm-evidence"
+      ],
+      "difficulty": "medium",
+      "answer": {
+        "value": false
+      }
+    },
+    {
+      "id": "limited-claim-rewrite",
+      "version": 1,
+      "lesson": "health-information",
+      "knowledge_point": "limited-claim",
+      "type": "open",
+      "prompt": "把“研究已经证实人人长期用都有效”改成一条适合尚未核清原文时的说明，并列两个后续核查问题。",
+      "explanation": "可保留不确定性，不要求在材料不足时给出非黑即白结论。",
+      "sources": [
+        "tcm-evidence"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "明确目前尚未核实原文而非伪称已经证实",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "提出至少两个具体核查问题，如人群、方法、比较、结果或风险",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "不将证据不足写成人人有效或人人无效的全称结论",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "我还没核实原始研究，暂不能确认这个主张。需要查研究针对谁、与什么比较及观察了哪些风险，不能据此宣称所有人长期使用都有用。"
+      }
+    },
+    {
+      "id": "consultation-summary-summary",
+      "version": 1,
+      "lesson": "consultation-and-review",
+      "knowledge_point": "consultation-summary",
+      "type": "single_choice",
+      "prompt": "哪种开头更适合就诊说明？",
+      "explanation": "事实、时间线和影响比未经确认的诊断标签更便于沟通。",
+      "sources": [
+        "health-literacy-2024",
+        "herbal-safe"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "我已确认某证，您只要按这个开药"
+        },
+        {
+          "label": "B",
+          "body": "只念出广告里的术语"
+        },
+        {
+          "label": "C",
+          "body": "从何时开始出现哪些具体表现，怎样变化并影响生活"
+        },
+        {
+          "label": "D",
+          "body": "省略全部既往用药"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "consultation-summary-prepare",
+      "version": 1,
+      "lesson": "consultation-and-review",
+      "knowledge_point": "consultation-summary",
+      "type": "multiple_choice",
+      "prompt": "为咨询准备哪些资料较有帮助？（多选）",
+      "explanation": "已用产品也属于应说明的信息，不能因为不是处方药就故意省略。",
+      "sources": [
+        "health-literacy-2024",
+        "herbal-safe"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "主要困扰、发生时间及变化"
+        },
+        {
+          "label": "B",
+          "body": "目前用药、过敏和相关既往情况"
+        },
+        {
+          "label": "C",
+          "body": "最想确认的问题"
+        },
+        {
+          "label": "D",
+          "body": "为避免麻烦隐去自行使用的补充剂"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "boundary-response-urgent",
+      "version": 1,
+      "lesson": "consultation-and-review",
+      "knowledge_point": "boundary-response",
+      "type": "single_choice",
+      "prompt": "遇到明显急症或需要紧急医疗帮助时，应怎样处理？",
+      "explanation": "课程练习和记录不能成为延后紧急求助的前置条件。",
+      "sources": [
+        "health-literacy-2024",
+        "herbal-safe"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "及时联系当地急救服务，不等课程或 AI 回复"
+        },
+        {
+          "label": "B",
+          "body": "先做完本课才能求助"
+        },
+        {
+          "label": "C",
+          "body": "等待 AI 收齐全部信息才求助"
+        },
+        {
+          "label": "D",
+          "body": "靠一个术语自行排除风险"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "A"
+        ]
+      }
+    },
+    {
+      "id": "boundary-response-reply",
+      "version": 1,
+      "lesson": "consultation-and-review",
+      "knowledge_point": "boundary-response",
+      "type": "open",
+      "prompt": "有人请 AI 凭一张照片确定疾病并开药。写一个既说明判断边界、又能提供实际帮助的回应。",
+      "explanation": "不要求无意义地拒绝所有解释；概念澄清和信息整理仍是有用的帮助。",
+      "sources": [
+        "health-literacy-2024",
+        "herbal-safe"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "明确单张照片或现有材料不足以确定个体诊断及处方",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "提出可帮助整理事实、时间线、用药资料或专业咨询问题",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "将诊疗交由有资质的专业人员，急需帮助时不等待 AI；不输出个人诊断或处方",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "这张照片不足以确认疾病或开药。我可以帮你整理发生时间、变化、用药与想问的问题，供医师评估；如有明显急症，应及时寻求当地急救帮助。"
+      }
+    },
+    {
+      "id": "learning-transfer-advert",
+      "version": 1,
+      "lesson": "consultation-and-review",
+      "knowledge_point": "learning-transfer",
+      "type": "single_choice",
+      "prompt": "虚构广告称“按五行设计，三人体验好，所以适合所有人长期用”。哪项结论有依据？",
+      "explanation": "先分层，再核查；理论与个人体验不能直接支持普遍适用和长期安全。",
+      "sources": [
+        "research-reading",
+        "tcm-evidence",
+        "herbal-safe"
+      ],
+      "difficulty": "medium",
+      "options": [
+        {
+          "label": "A",
+          "body": "三人体验已证明长期安全"
+        },
+        {
+          "label": "B",
+          "body": "五行归类已证明人人适用"
+        },
+        {
+          "label": "C",
+          "body": "既有个案就无需产品信息"
+        },
+        {
+          "label": "D",
+          "body": "广告混合了理论、体验和超出材料的推广，仍需核查"
+        }
+      ],
+      "answer": {
+        "choices": [
+          "D"
+        ]
+      }
+    },
+    {
+      "id": "learning-transfer-capstone",
+      "version": 1,
+      "lesson": "consultation-and-review",
+      "knowledge_point": "learning-transfer",
+      "type": "open",
+      "prompt": "针对教材最后一课的虚构广告，写一张简版核查卡：分出三层主张、两项缺失信息、一条有边界的结论，以及一句专业咨询问题。",
+      "explanation": "这是一道迁移任务，允许不同组织方式；不要求复述标准答案，也不进行临床判分。",
+      "sources": [
+        "research-reading",
+        "tcm-evidence",
+        "herbal-safe"
+      ],
+      "difficulty": "medium",
+      "rubric": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "准确区分理论归类、个人体验和普遍长期适用的结论",
+            "points": 1
+          },
+          {
+            "id": "c2",
+            "description": "列至少两项与产品身份、研究比较、人群或风险相关的缺失信息",
+            "points": 1
+          },
+          {
+            "id": "c3",
+            "description": "结论不越过现有材料，咨询指向具体核对且不建议自行停换药",
+            "points": 1
+          }
+        ],
+        "partial_ratio": 0.3333333333333333,
+        "pass_ratio": 1,
+        "reference_answer": "理论设计、三人的体验、人人长期适用是不同层次。尚缺准确产品信息及合适比较和安全资料。目前这些信息不足以支持普遍长期适用；可以带包装与用药清单，请医师或药师核对相关问题。"
+      }
+    }
+  ]
+}

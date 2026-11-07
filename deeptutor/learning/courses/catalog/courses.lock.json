@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "note": "已发布课程版本的内容哈希。发布后版本目录不可修改；要改内容请发新版本。",
+  "versions": {
+    "tcm-foundations@1.0.0": "af137f8b30b681c93ba4491496649160df35b0e05a60ced44b507aa150712106"
+  }
+}

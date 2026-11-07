@@ -64,7 +64,10 @@ ID 一旦发布就是稳定标识：学员的作答记录、错题、ID 映射�
 ### manifest.json
 
 `schema_version`、`course_id`、`version`、`title`、`summary`、`editors`（至少一人）、`updated_at` 必填；
-`review: {reviewers, reviewed_at, note}` 在 published / withdrawn 版本必填；
+`release_stage` 可为 `reviewed`（默认）或 `trial`。`review: {reviewers, reviewed_at, note}` 在
+非试读的 published / withdrawn 版本必填。试读版本可保持 `review: null`，但必须填写非空
+`trial_notice`，明确未完成的专业审校；目录卡片、详情和单课页展示试读状态，辅导资料也保留
+这个声明。试读没有绿色审核徽章，不得伪造审核人。试读升级为已审校版本仍应发布新内容版本。
 可选 `subtitle`、`language`、`tags`、`disclaimer`（课程页必显示）、`changelog`。
 
 ### outline.json

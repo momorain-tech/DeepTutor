@@ -19,7 +19,7 @@ import { masterySessionRoute } from '@/lib/mastery-mode'
 import { createNote } from '@/lib/notes-api'
 import { setPendingPrompt } from '@/lib/pending-prompt'
 import { CoursePractice } from './CoursePractice'
-import { LessonMarkdown, SourceList, useMyEnrollments } from './CourseParts'
+import { CourseTrialNotice, LessonMarkdown, SourceList, useMyEnrollments } from './CourseParts'
 
 const SAVE_DELAY_MS = 1500
 
@@ -227,6 +227,7 @@ export function CourseLessonPage({ courseId, lessonId }: { courseId: string; les
         </Link>
         <span>v{content.version}</span>
       </div>
+      <CourseTrialNotice course={content} />
       {error && <LearningErrorState message={error} onRetry={loadLesson} />}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">

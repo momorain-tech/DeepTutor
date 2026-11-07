@@ -235,6 +235,8 @@ class CourseRepository:
         return LessonContent(
             course_id=package.course_id,
             version=package.version,
+            release_stage=package.manifest.release_stage,
+            trial_notice=package.manifest.trial_notice,
             lesson=self.public_lesson(package, lesson),
             markdown=package.lessons_markdown.get(lesson.id, ""),
             anchors=list(package.lesson_anchors.get(lesson.id, [])),
@@ -250,6 +252,8 @@ class CourseRepository:
         return CourseSummary(
             course_id=course.course_id,
             version=package.version,
+            release_stage=manifest.release_stage,
+            trial_notice=manifest.trial_notice,
             title=manifest.title,
             subtitle=manifest.subtitle,
             summary=manifest.summary,
@@ -263,7 +267,7 @@ class CourseRepository:
                 reviewed_at=manifest.review.reviewed_at.isoformat(),
                 note=manifest.review.note,
             )
-            if manifest.review
+            if manifest.review and manifest.release_stage != "trial"
             else None,
             updated_at=manifest.updated_at.isoformat(),
             lesson_count=len(package.outline.lessons),

@@ -64,6 +64,8 @@ export interface CourseSummary {
   tags: string[]
   editors: CoursePerson[]
   review: CourseReview | null
+  release_stage: 'reviewed' | 'trial'
+  trial_notice: string
   updated_at: string
   lesson_count: number
   knowledge_point_count: number
@@ -84,8 +86,10 @@ export interface CourseDetail extends CourseSummary {
 export interface LessonContent {
   course_id: string
   version: string
+  release_stage: 'reviewed' | 'trial'
+  trial_notice: string
   lesson: CourseLesson
-  /** 审核过的受限 Markdown 原文。 */
+  /** 受限 Markdown 原文；试读与审校状态由 release_stage 指明。 */
   markdown: string
   anchors: string[]
   sources: CourseSource[]

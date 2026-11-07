@@ -183,7 +183,7 @@ class CoursePerson(BaseModel):
 
 
 class CourseReview(BaseModel):
-    """这一版内容由谁、在哪天审核过。已发布版本必须有。"""
+    """这一版内容由谁、在哪天审核过。正式审校版必须有，试读版可保持空。"""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -204,6 +204,9 @@ class CourseManifest(BaseModel):
     language: str = Field(default="zh-CN", max_length=16)
     tags: list[str] = Field(default_factory=list, max_length=12)
     editors: list[CoursePerson] = Field(min_length=1)
+    # 试读可公开，但必须带明确提示；不得为满足发布校验伪造审核人。
+    release_stage: Literal["reviewed", "trial"] = "reviewed"
+    trial_notice: str = Field(default="", max_length=1000)
     review: CourseReview | None = None
     updated_at: date
     #: 课程页上必须展示的提示（比如"本课程内容不能替代专业意见"），由课程作者自己写。
@@ -460,6 +463,8 @@ class CourseSummary(BaseModel):
     tags: list[str]
     editors: list[PublicPerson]
     review: PublicReview | None
+    release_stage: Literal["reviewed", "trial"] = "reviewed"
+    trial_notice: str = ""
     updated_at: str
     lesson_count: int
     knowledge_point_count: int
@@ -478,10 +483,12 @@ class CourseDetail(CourseSummary):
 
 
 class LessonContent(BaseModel):
-    """一节课的教材正文。``markdown`` 是审核过的原文，前端按受限 Markdown 渲染。"""
+    """一节课的教材正文。试读状态随原文传递，前端按受限 Markdown 渲染。"""
 
     course_id: str
     version: str
+    release_stage: Literal["reviewed", "trial"] = "reviewed"
+    trial_notice: str = ""
     lesson: PublicLesson
     markdown: str
     anchors: list[str]
