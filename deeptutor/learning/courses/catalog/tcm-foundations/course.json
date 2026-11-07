@@ -2,10 +2,10 @@
   "schema_version": 1,
   "course_id": "tcm-foundations",
   "versions": {
-    "1.0.0": "draft"
+    "1.0.0": "published"
   },
-  "enrollment_open": false,
-  "learning_open": false,
+  "enrollment_open": true,
+  "learning_open": true,
   "suspended_lessons": [],
   "errata": []
 }

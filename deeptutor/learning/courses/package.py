@@ -384,7 +384,11 @@ def load_version(
                 f"version 写的是 {manifest.version!r}，但目录名是 {version!r}",
                 where,
             )
-        if status != VersionStatus.DRAFT and manifest.review is None:
+        if manifest.release_stage == "trial" and not manifest.trial_notice.strip():
+            report.add(
+                CourseErrorCode.FIELD_INVALID, "试读版本必须填写 trial_notice，说明尚未专业审校", where
+            )
+        if status != VersionStatus.DRAFT and manifest.release_stage != "trial" and manifest.review is None:
             report.add(
                 CourseErrorCode.REVIEW_MISSING, "已发布或已撤下的版本必须有审核信息 review", where
             )

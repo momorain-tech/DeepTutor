@@ -42,7 +42,7 @@ export function CourseCatalog() {
   return (
     <LearningShell
       title={t('Official courses')}
-      subtitle={t('Systematic courses compiled and reviewed by editors. Join one and it becomes your own learning path.')}
+      subtitle={t('Follow a structured course at your own pace. Trial editions are clearly marked.')}
       icon={GraduationCap}
     >
       {error && <LearningErrorState message={error} onRetry={load} />}
@@ -85,7 +85,10 @@ export function CourseCard({ course, enrollment }: { course: CourseSummary; enro
       <p className="line-clamp-3 text-[13px] leading-[1.7] text-[var(--muted-foreground)]">{course.summary}</p>
       <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-[var(--muted-foreground)]">
         <span>{t('{{count}} lessons', { count: course.lesson_count })}</span>
-        {course.review && (
+        {course.release_stage === 'trial' && (
+          <span className="font-medium text-amber-700 dark:text-amber-300">{t('Trial edition')}</span>
+        )}
+        {course.review && course.release_stage !== 'trial' && (
           <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
             <ShieldCheck size={12} aria-hidden="true" />
             {t('Reviewed')}

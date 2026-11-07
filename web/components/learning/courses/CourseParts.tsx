@@ -32,6 +32,18 @@ export function LessonMarkdown({ markdown }: { markdown: string }) {
   )
 }
 
+/** 试读声明独立于审核记录，目录、详情、单课直达都不能冒充已审校。 */
+export function CourseTrialNotice({ course }: { course: Pick<CourseSummary, 'release_stage' | 'trial_notice'> }) {
+  const { t } = useTranslation()
+  if (course.release_stage !== 'trial') return null
+  return (
+    <div role="note" className="mb-5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] leading-[1.75]">
+      <p className="font-semibold">{t('Trial edition')}</p>
+      <p>{course.trial_notice}</p>
+    </div>
+  )
+}
+
 /** 编选、审核、版本、更新时间——让学员知道这份教材是谁负责的。 */
 export function CourseCredits({ course }: { course: CourseSummary }) {
   const { t } = useTranslation()
@@ -46,7 +58,7 @@ export function CourseCredits({ course }: { course: CourseSummary }) {
       <div className="flex gap-2">
         <dt className="shrink-0 text-[var(--muted-foreground)]">{t('Reviewed by')}</dt>
         <dd className="min-w-0">
-          {course.review ? (
+          {course.review && course.release_stage !== 'trial' ? (
             <span className="inline-flex items-center gap-1">
               <ShieldCheck size={13} className="shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               {names(course.review.reviewers)} · {course.review.reviewed_at}

@@ -26,7 +26,7 @@ jobs:
         working-directory: web
         run: |
           npm run typecheck
-          npx vitest run tests/momorain-base-path.spec.ts tests/momorain-guest.spec.ts tests/momorain-courses.spec.ts
+          npx vitest run tests/momorain-base-path.spec.ts tests/momorain-guest.spec.ts tests/momorain-courses.spec.ts tests/course-trial.spec.tsx tests/course-pending-submission.spec.tsx
       # 官方课程包：格式、引用、受限 Markdown、已发布版本哈希锁。任何一项不过都不发布。
       - uses: actions/setup-python@v5
         with:
