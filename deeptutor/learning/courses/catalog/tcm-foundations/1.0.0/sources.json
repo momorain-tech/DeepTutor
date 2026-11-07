@@ -1,0 +1,104 @@
+{
+  "sources": [
+    {
+      "id": "tcm-education",
+      "title": "健康教育中医药基本内容",
+      "kind": "guideline",
+      "publisher": "海曙区卫生健康局公开页面",
+      "url": "https://www.haishu.gov.cn/art/2024/4/22/art_1229790084_58995062.html",
+      "locator": "一（一）—（四）；二：生活方式教育范围",
+      "edition": "网页发布于 2024-04-22",
+      "review": null
+    },
+    {
+      "id": "bucm-theory",
+      "title": "《中医基础理论》教学大纲（本科）",
+      "kind": "web",
+      "publisher": "北京中医药大学远程教育学院",
+      "url": "https://jxjyxb.bucm.edu.cn/ibucm/zhengwen/update/1_4b.htm",
+      "locator": "绪论；第一章阴阳五行；第二至四章藏象、气血津液、经络",
+      "edition": "历史教学资料；检索正文可读，原站直连曾超时，发布前复核链接",
+      "review": null
+    },
+    {
+      "id": "bucm-exam-2025",
+      "title": "2025 年基础医学综合（中医）考试大纲",
+      "kind": "other",
+      "publisher": "北京中医药大学研究生院公开文件",
+      "url": "https://yanjiusheng.bucm.edu.cn/docs/2024-10/7832c8f9553b4a5dbc7f95267cc2027f.pdf",
+      "locator": "PDF 印刷页 2—5：中医基础理论；中医诊断学部分：四诊与辨证",
+      "edition": "2025 年考试大纲；不是本课程的考试承诺",
+      "review": null
+    },
+    {
+      "id": "bucm-qi-blood",
+      "title": "基础医学综合（中医）考试大纲（2020 年公开文件）",
+      "kind": "other",
+      "publisher": "北京中医药大学研究生院",
+      "url": "https://yanjiusheng.bucm.edu.cn/docs/20200915120435519822.pdf",
+      "locator": "中医基础理论（四）气、血、津液；（五）经络",
+      "edition": "2020 年公开文件；仅作概念范围参照",
+      "review": null
+    },
+    {
+      "id": "ahtcm-zangxiang",
+      "title": "中医学院开展中医基础理论课程教学示范公开课",
+      "kind": "article",
+      "publisher": "安徽中医药大学中医学院",
+      "url": "https://lcxy.ahtcm.edu.cn/info/1113/33281.htm",
+      "locator": "教学介绍中关于藏象肾、解剖基础与功能系统的段落",
+      "edition": "2025-11-11",
+      "review": null
+    },
+    {
+      "id": "health-literacy-2024",
+      "title": "中国公民健康素养——基本知识与技能（2024年版）",
+      "kind": "guideline",
+      "publisher": "国家卫生健康委；甘肃卫生健康公开刊载",
+      "url": "https://wsjk.gansu.gov.cn/wsjk/c118353/202406/173933066/files/d86b92027c12468fbbd6fdb6ada75e5f.pdf",
+      "locator": "正式通知及附件：第 25—43、53、56、58 条；国卫办宣传函〔2024〕191号",
+      "edition": "2024-05-28 正式发布；不使用此前征求意见稿",
+      "review": null
+    },
+    {
+      "id": "herbal-safe",
+      "title": "中药的安全使用",
+      "kind": "web",
+      "publisher": "香港特别行政区政府卫生署中医药规管办公室",
+      "url": "https://www.cmro.gov.hk/html/gb/useful_information/public_health/feature_articles/Safe_Use_of_Chinese_Medicines.html",
+      "locator": "验方、合理剂量、长期服用及文末专业咨询提示",
+      "edition": "网页；2026-11-07 查阅，不采用其中具体剂量作课程内容",
+      "review": null
+    },
+    {
+      "id": "herbal-adverse",
+      "title": "中药的不良反应",
+      "kind": "web",
+      "publisher": "香港特别行政区政府卫生署中医药规管办公室",
+      "url": "https://www.cmro.gov.hk/html/gb/useful_information/public_health/exhibit_boards/Adverse_Reactions_of_Chinese_Medicines.html",
+      "locator": "配错药材、质量问题及标签信息提示",
+      "edition": "网页；2026-11-07 查阅",
+      "review": null
+    },
+    {
+      "id": "research-reading",
+      "title": "How To Make Sense of a Scientific Journal Article — Overview",
+      "kind": "web",
+      "publisher": "美国国立卫生研究院 NCCIH",
+      "url": "https://www.nccih.nih.gov/health/know-science/how-to-make-sense-of-a-scientific-journal-article/overview",
+      "locator": "Overview：查找研究原始来源；课程五问为原创教学框架",
+      "edition": "网页；2026-11-07 查阅",
+      "review": null
+    },
+    {
+      "id": "tcm-evidence",
+      "title": "Traditional Chinese Medicine: What You Need To Know",
+      "kind": "web",
+      "publisher": "美国国立卫生研究院 NCCIH",
+      "url": "https://www.nccih.nih.gov/health/traditional-chinese-medicine-what-you-need-to-know",
+      "locator": "What Is Traditional Chinese Medicine；effectiveness / safety 分项介绍",
+      "edition": "网页；2026-11-07 查阅；不外推具体个人疗效",
+      "review": null
+    }
+  ]
+}
