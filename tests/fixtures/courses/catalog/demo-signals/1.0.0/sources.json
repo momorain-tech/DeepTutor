@@ -1,0 +1,20 @@
+{
+  "sources": [
+    {
+      "id": "handbook",
+      "title": "《灯塔信号手册》（虚构）",
+      "kind": "book",
+      "locator": "第 2 章 第 1–3 节",
+      "edition": "第 1 版",
+      "publisher": "示例出版社",
+      "review": { "reviewed_by": "示例审核人", "reviewed_at": "2026-11-07" }
+    },
+    {
+      "id": "notice",
+      "title": "示例港务通告（虚构）",
+      "kind": "web",
+      "url": "https://example.com/notice",
+      "locator": "第 3 条"
+    }
+  ]
+}

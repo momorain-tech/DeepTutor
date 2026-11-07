@@ -10,13 +10,17 @@
 默认响应；不在白名单里的一律 401。这里的每个函数都只能读部署级的全局信息
 （模块清单、能力清单、出厂默认值），不能读任何用户目录或调用模型。
 
-前端 web/lib/momorain-guest.ts 里有同一张表（GUEST_PATHS），两边要一起改。
+前端 web/lib/momorain-guest.ts 里有同一张表（GUEST_PATHS / GUEST_PATTERNS），两边要一起改。
+
+官方课程的目录、详情、公开样课也对访客开放（GUEST_PATTERNS）：它们只读部署级的
+课程包文件，答案和草稿在投影层就没有字段，访客读到的和登录用户完全一样。
 """
 
 from __future__ import annotations
 
 import asyncio
 import inspect
+import re
 from typing import Any, Callable
 
 
@@ -63,12 +67,51 @@ GUEST_ROUTES: dict[str, Callable[[], Any]] = {
 }
 
 
+def _courses() -> dict[str, Any]:
+    from deeptutor.learning.courses.repository import public_courses
+
+    return public_courses()
+
+
+def _course_detail(course_id: str) -> dict[str, Any] | None:
+    from deeptutor.learning.courses.repository import public_course_detail
+
+    return public_course_detail(course_id)
+
+
+def _course_preview(course_id: str) -> dict[str, Any] | None:
+    from deeptutor.learning.courses.repository import public_course_preview
+
+    return public_course_preview(course_id)
+
+
+GUEST_ROUTES["/api/courses"] = _courses
+
+# 带参数的公共路径。参数只允许课程 ID 的字符集，免得拼出奇怪的东西。
+_COURSE_ID = r"([a-z0-9][a-z0-9_-]{0,63})"
+GUEST_PATTERNS: list[tuple[re.Pattern[str], Callable[[str], Any]]] = [
+    (re.compile(rf"^/api/courses/{_COURSE_ID}$"), _course_detail),
+    (re.compile(rf"^/api/courses/{_COURSE_ID}/preview$"), _course_preview),
+]
+
+#: 匹配上了公共路径、但资源不存在（课程不存在或没发布）。中间件据此回 404 而不是 401。
+NOT_FOUND: dict[str, Any] = {"detail": {"code": "COURSE_NOT_FOUND", "message": "课程不存在或尚未发布"}}
+
+
 async def guest_response(path: str, method: str) -> dict[str, Any] | None:
-    """命中白名单就返回访客响应，否则 None（调用方应回 401）。"""
+    """命中白名单就返回访客响应，否则 None（调用方应回 401）。
+
+    带参数的公共路径找不到资源时返回 :data:`NOT_FOUND`（同一个对象，调用方用 ``is`` 判断）。
+    """
     if method not in {"GET", "HEAD"}:
         return None
     handler = GUEST_ROUTES.get(path)
     if handler is None:
+        for pattern, param_handler in GUEST_PATTERNS:
+            match = pattern.match(path)
+            if match:
+                body = await asyncio.to_thread(param_handler, match.group(1))
+                return NOT_FOUND if body is None else body
         return None
     if inspect.iscoroutinefunction(handler):
         return await handler()

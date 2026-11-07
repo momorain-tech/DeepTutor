@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "note": "已发布课程版本的内容哈希。发布后版本目录不可修改；要改内容请发新版本。",
+  "versions": {
+    "demo-signals@1.0.0": "5a94735b6a16791df7b4ae9d696a5692fd622fe57f0191a001bd7ceb93f66ad0"
+  }
+}

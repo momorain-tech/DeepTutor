@@ -91,12 +91,14 @@ class MomorainMiddleware:
                 # 这里在 ensure_external_user 之前返回，所以访客不会建任何用户目录。
                 # 登录服务不可用（503）不算未登录，照常报错，免得把已登录用户误当访客。
                 if exc.status_code == 401 and scope["type"] == "http":
-                    from .guest import guest_response
+                    from .guest import NOT_FOUND, guest_response
 
                     body = await guest_response(path, scope.get("method", "GET"))
                     if body is not None:
                         return await JSONResponse(
-                            body, headers={"Cache-Control": "no-store"}
+                            body,
+                            status_code=404 if body is NOT_FOUND else 200,
+                            headers={"Cache-Control": "no-store"},
                         )(scope, receive, send)
                 raise
             from deeptutor.multi_user.identity import ensure_external_user

@@ -1749,6 +1749,10 @@ class LearningService:
         dry_run: bool = False,
     ) -> dict[str, Any]:
         """Shared identity, relation and question effects for preview and save."""
+        # momorain 官方课程：大纲由课程包统一维护，任何改纲入口都不许改（含 AI 改纲工具）。
+        from deeptutor.learning.courses.enrollment import assert_outline_editable
+
+        assert_outline_editable(tx._conn, tx.progress.book_id)
         active_interaction_removed = False
         book_id = tx.progress.book_id
         if name.strip() and not tx.progress.name.strip():
@@ -1933,6 +1937,9 @@ class LearningService:
         from deeptutor.learning.storage import LearningConflictError
 
         with self._store.transaction(book_id) as tx:
+            from deeptutor.learning.courses.enrollment import assert_outline_editable
+
+            assert_outline_editable(tx._conn, book_id)
             if tx.base_revision != expected_revision:
                 raise LearningConflictError(book_id, expected_revision, tx.base_revision)
             original = tx.progress
@@ -1988,6 +1995,9 @@ class LearningService:
         from deeptutor.learning.storage import LearningConflictError
 
         with self._store.transaction(book_id) as tx:
+            from deeptutor.learning.courses.enrollment import assert_outline_editable
+
+            assert_outline_editable(tx._conn, book_id)
             draft = tx.module_preview(preview_id, session_id=session_id)
             replayed = draft["committed_revision"] is not None
             if not replayed:

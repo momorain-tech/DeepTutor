@@ -1,0 +1,53 @@
+{
+  "units": [
+    { "id": "basics", "title": "第一单元 · 基础信号", "lessons": ["colors", "combos"] }
+  ],
+  "lessons": [
+    {
+      "id": "colors",
+      "title": "第 1 课 · 三种灯色",
+      "order": 1,
+      "objectives": ["说出三种灯色各自的含义", "区分常亮与闪烁"],
+      "material": "lessons/colors.md",
+      "knowledge_points": ["color-meaning", "steady-vs-blink"],
+      "preview": true,
+      "estimated_minutes": 10
+    },
+    {
+      "id": "combos",
+      "title": "第 2 课 · 组合信号",
+      "order": 2,
+      "objectives": ["读懂两盏灯的组合信号"],
+      "material": "lessons/combos.md",
+      "knowledge_points": ["combo-reading"],
+      "preview": false,
+      "estimated_minutes": 15
+    }
+  ],
+  "knowledge_points": [
+    {
+      "id": "color-meaning",
+      "name": "灯色的含义",
+      "type": "memory",
+      "prerequisites": [],
+      "sources": ["handbook"],
+      "anchors": ["three-colors"]
+    },
+    {
+      "id": "steady-vs-blink",
+      "name": "常亮与闪烁",
+      "type": "concept",
+      "prerequisites": ["color-meaning"],
+      "sources": ["handbook"],
+      "anchors": ["steady-blink"]
+    },
+    {
+      "id": "combo-reading",
+      "name": "组合信号的读法",
+      "type": "procedure",
+      "prerequisites": ["color-meaning", "steady-vs-blink"],
+      "sources": ["handbook", "notice"],
+      "anchors": ["reading-order", "example"]
+    }
+  ]
+}
