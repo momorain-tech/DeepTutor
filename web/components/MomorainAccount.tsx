@@ -197,6 +197,26 @@ export function MomorainAccountItem({ collapsed = false }: { collapsed?: boolean
   );
 }
 
+/**
+ * 现代布局专用：访客在侧栏「新对话」上方看到的一行登录入口。
+ * 现代布局把账号收进了工作区菜单，访客不点开菜单就看不到「登录」，所以这里单独露一行；
+ * 只给访客显示，登录后消失（那时昵称/余额在菜单里）。经典布局底部本来就有，不用这个。
+ */
+export function MomorainGuestLogin() {
+  const { status } = useAccountState();
+  if (!MOMORAIN_ENABLED || status !== "guest") return null;
+  return (
+    <a
+      href={currentLoginHref()}
+      onClick={(event) => { event.preventDefault(); startLogin(); }}
+      className="mb-2 flex w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-[12.5px] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
+    >
+      <LogIn size={14} strokeWidth={1.7} className="shrink-0" />
+      <span>登录 · 免配置用模型</span>
+    </a>
+  );
+}
+
 /** 「需要登录」说明框：讲清楚为什么要登录，由用户决定去不去，不自动跳走。 */
 function LoginPrompt({ reason, onClose }: { reason: LoginReason; onClose: () => void }) {
   const expired = reason.kind === "expired";
