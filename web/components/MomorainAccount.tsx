@@ -80,10 +80,11 @@ export function MomorainSession() {
       try {
         // 必须访问站点根，让 user-login 给 Cookie 滑动续期。
         const response = await appFetch("/api/auth/session", { cache: "no-store" });
+        if (!alive) return;
         if (response.status === 401) {
           // 原来登录着、现在 401：登录过期了。不直接刷新整页（没保存的输入会丢），
           // 而是弹框提示，让用户自己点「重新登录」（点的时候会先暂存草稿）。
-          if (principal.current) { noteSessionExpired(); if (alive) setState({ status: "guest", user: null }); return; }
+          if (principal.current) { noteSessionExpired(); setState({ status: "guest", user: null, access: null, error: "" }); return; }
           if (alive) { principal.current = null; setState({ status: "guest", user: null, access: null, error: "" }); }
           return;
         }
@@ -138,7 +139,7 @@ const ICON =
 export function MomorainAccountItem({ collapsed = false }: { collapsed?: boolean }) {
   const { status, user, access, error } = useAccountState();
   if (!MOMORAIN_ENABLED) return null;
-  if (status === "loading") {
+  if (status === "loading" || (status === "guest" && error)) {
     // 还没问到登录状态时先不画，避免「登录」闪一下又变成昵称。
     if (!error) return null;
     // 但登录服务出错（503、断网）时要说出来，不能装成访客，也不能什么都不显示。
@@ -203,8 +204,8 @@ export function MomorainAccountItem({ collapsed = false }: { collapsed?: boolean
  * 只给访客显示，登录后消失（那时昵称/余额在菜单里）。经典布局底部本来就有，不用这个。
  */
 export function MomorainGuestLogin() {
-  const { status } = useAccountState();
-  if (!MOMORAIN_ENABLED || status !== "guest") return null;
+  const { status, error } = useAccountState();
+  if (!MOMORAIN_ENABLED || status !== "guest" || error) return null;
   return (
     <a
       href={currentLoginHref()}
