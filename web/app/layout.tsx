@@ -1,4 +1,4 @@
-import MomorainNav from "@/components/MomorainNav";
+import { MomorainSession } from "@/components/MomorainAccount";
 import { withBasePath } from "@/lib/base-path";
 import type { Metadata, Viewport } from "next";
 
@@ -37,8 +37,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      // momorain-has-nav：页面顶上有账号栏，外壳高度要扣掉它（见 globals.css 末尾）。
-      className={process.env.NEXT_PUBLIC_MOMORAIN_ENABLED === "true" ? "momorain-fonts momorain-has-nav" : "momorain-fonts"}
+      className="momorain-fonts"
     >
       <head>
         <ThemeScript />
@@ -47,7 +46,8 @@ export default function RootLayout({
         className="font-sans bg-[var(--background)] text-[var(--foreground)]"
         suppressHydrationWarning
       >
-        <MomorainNav />
+        {/* momorain 登录状态 + 「需要登录」弹框；账号条目本身在侧栏底部（见 MomorainAccount.tsx） */}
+        <MomorainSession />
         <AppShellProvider>
           <SettingsReturnTracker />
           <WorkspaceNavigation />

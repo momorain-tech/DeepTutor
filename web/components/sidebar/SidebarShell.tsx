@@ -39,6 +39,7 @@ import { WorkspaceMenu } from "@/components/sidebar/WorkspaceMenu";
 import { SHORTCUTS, matchesShortcut } from "@/lib/shortcuts";
 import { RecordHeader, useRecordView } from "@/components/sidebar/RecordList";
 import type { LearningSessions } from "@/components/sidebar/LearningNavigation";
+import { MomorainGuestLogin } from "@/components/MomorainAccount";
 
 // The fallback history list is needed only by shells without organization.
 const SessionList = dynamic(() => import("@/components/SessionList"), { ssr: false });
@@ -302,7 +303,7 @@ export function SidebarShell({
   /* ---- Collapsed state ---- */
   if (collapsed) {
     return (
-      <aside className={`${bodySlot ? "" : "dt-product-sidebar"} dt-rail relative flex h-[var(--app-viewport-h)] w-[60px] shrink-0 flex-col items-center bg-[var(--secondary)] py-3 transition-all duration-200`}>
+      <aside className={`${bodySlot ? "" : "dt-product-sidebar"} dt-rail relative flex h-dvh w-[60px] shrink-0 flex-col items-center bg-[var(--secondary)] py-3 transition-all duration-200`}>
         {/* The open sidebar's header, stood on end: the workspace (with its
             menu of settings and account), the way back out, then search. */}
         {bodySlot ? (
@@ -360,7 +361,7 @@ export function SidebarShell({
   return (
     <aside
       style={{ "--sidebar-width": `${resize.width}px` } as CSSProperties}
-      className={`${bodySlot ? "" : "dt-product-sidebar"} relative flex h-[var(--app-viewport-h)] w-[var(--sidebar-width)] max-w-[45vw] shrink-0 flex-col bg-[var(--secondary)] max-md:w-[220px] max-md:max-w-[85vw]`}
+      className={`${bodySlot ? "" : "dt-product-sidebar"} relative flex h-dvh w-[var(--sidebar-width)] max-w-[45vw] shrink-0 flex-col bg-[var(--secondary)] max-md:w-[220px] max-md:max-w-[85vw]`}
     >
       {bodySlot ? (
         <div className="flex h-[52px] shrink-0 items-center justify-between px-4">
@@ -435,6 +436,8 @@ export function SidebarShell({
       {/* Secondary nav + footer */}
       {footerOverride ? footerOverride(false) : (
         <div className="dt-sidebar-footer">
+          {/* momorain：访客的登录入口（只在没登录时出现，见 MomorainAccount.tsx） */}
+          <MomorainGuestLogin />
           <Tooltip label={t("navigation.newChat")} side="top" shortcut={SHORTCUTS.newChat} as="div" className="block w-full">
             <Link prefetch={false} href="/chat" onClick={handleHomeClick} className="dt-new-conversation">
               <SquarePen size={16} strokeWidth={1.7} />

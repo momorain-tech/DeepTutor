@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { fetchAuthStatus, type AuthStatus } from "@/lib/auth";
 import { UserAvatar } from "@/components/UserAvatar";
 import Tooltip from "@/shared/ui/Tooltip";
+import { MOMORAIN_ENABLED } from "@/lib/momorain-guest";
 
 interface ProfileLinkProps {
   collapsed?: boolean;
@@ -18,6 +19,9 @@ export function ProfileLink({ collapsed = false }: ProfileLinkProps) {
   const [status, setStatus] = useState<AuthStatus | null>(null);
 
   useEffect(() => {
+    // 统一账号模式下不用上游的本地资料页：后端已封掉 /api/auth/profile，点进去是坏页面。
+    // 昵称、余额由侧栏的 MomorainAccountItem 显示，链到 momorain.com/account。
+    if (MOMORAIN_ENABLED) return;
     fetchAuthStatus().then((next) => {
       // Only surface the link when auth is on AND the user is signed in.
       if (next?.enabled && next?.authenticated) setStatus(next);
