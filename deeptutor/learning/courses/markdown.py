@@ -79,7 +79,9 @@ def check_markdown(text: str) -> MarkdownCheck:
             if target.startswith("#"):
                 continue
             if not target.startswith(("https://", "http://")):
-                result.problems.append(f"第 {number} 行：链接只能指向 http(s) 网址或本页锚点（#xxx）")
+                result.problems.append(
+                    f"第 {number} 行：链接只能指向 http(s) 网址或本页锚点（#xxx）"
+                )
     if in_fence:
         result.problems.append("代码块没有闭合")
     return result

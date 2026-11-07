@@ -286,7 +286,9 @@ def _topic_sources(items: list[TopicSourceRequest]) -> list[TopicSource]:
     # Official-course lesson sources are minted only by the enrollment flow,
     # which binds them to an enrollment record; a client cannot forge one.
     if any(item.kind == TopicSourceKind.COURSE for item in items):
-        raise HTTPException(status_code=422, detail="course sources can only be created by enrolling")
+        raise HTTPException(
+            status_code=422, detail="course sources can only be created by enrolling"
+        )
     return [
         TopicSource(
             id=item.id.strip() or f"source_{uuid.uuid4().hex}",

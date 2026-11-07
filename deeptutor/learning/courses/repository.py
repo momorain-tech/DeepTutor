@@ -99,7 +99,9 @@ class CourseRepository:
                         logger.error("课程版本 %s 与锁文件哈希不符，已停止提供", key)
                         del course.versions[version]
             for issue in report.errors:
-                logger.warning("课程包问题 %s: %s (%s)", issue.where, issue.message, issue.code.value)
+                logger.warning(
+                    "课程包问题 %s: %s (%s)", issue.where, issue.message, issue.code.value
+                )
             self._courses = courses
             self._report = report
             self._fingerprint = fingerprint
@@ -255,7 +257,9 @@ class CourseRepository:
             tags=list(manifest.tags),
             editors=[PublicPerson(**person.model_dump()) for person in manifest.editors],
             review=PublicReview(
-                reviewers=[PublicPerson(**person.model_dump()) for person in manifest.review.reviewers],
+                reviewers=[
+                    PublicPerson(**person.model_dump()) for person in manifest.review.reviewers
+                ],
                 reviewed_at=manifest.review.reviewed_at.isoformat(),
                 note=manifest.review.note,
             )
@@ -287,7 +291,9 @@ def public_source(source: CourseSource) -> PublicSource:
 
 
 def public_courses() -> dict:
-    return {"courses": [item.model_dump(mode="json") for item in get_course_repository().list_courses()]}
+    return {
+        "courses": [item.model_dump(mode="json") for item in get_course_repository().list_courses()]
+    }
 
 
 def public_course_detail(course_id: str) -> dict | None:

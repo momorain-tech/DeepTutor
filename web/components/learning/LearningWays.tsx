@@ -12,6 +12,7 @@ import { ArrowUpRight, ArrowRight, Check, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 type LearningKind = LearningSurface['kind']
 import { LEARNING_SURFACES, type LearningSurface } from './surfaces'
+import { OfficialCoursesHome } from './courses/OfficialCoursesHome'
 
 const FOCUSABLE = 'a[href], input:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
 const tileClass = (accent: string) =>
@@ -34,6 +35,9 @@ export function LearningWays() {
 
   return (
     <>
+      {/* momorain 官方课程入口。放在这个共享组件里，经典和现代两种首页都能显示；
+          没有已发布课程时它什么也不渲染。 */}
+      <OfficialCoursesHome />
       <section aria-labelledby={id} className="mb-10">
         <h2 id={id} className="sr-only">
           {t('Ways to learn')}

@@ -62,8 +62,10 @@ def _normalize_answer(question: CourseQuestion, answer: Any) -> Any:
             raise CourseError(CourseErrorCode.FIELD_INVALID, "请选择一个选项", 422)
         return [value]
     if question.type == "multiple_choice":
-        if not isinstance(answer, list) or not answer or any(
-            not isinstance(item, str) or item not in labels for item in answer
+        if (
+            not isinstance(answer, list)
+            or not answer
+            or any(not isinstance(item, str) or item not in labels for item in answer)
         ):
             raise CourseError(CourseErrorCode.FIELD_INVALID, "请至少选择一个选项", 422)
         return sorted(set(answer))
@@ -107,7 +109,9 @@ def _correct_answer(question: CourseQuestion) -> Any:
 
 
 def _answer_hash(answer: Any) -> str:
-    return hashlib.sha256(json.dumps(answer, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+    return hashlib.sha256(
+        json.dumps(answer, ensure_ascii=False, sort_keys=True).encode()
+    ).hexdigest()
 
 
 async def judge_open_answer(question: CourseQuestion, answer: str, lesson_text: str) -> dict:
@@ -307,15 +311,21 @@ class PracticeService:
 
     # 提交 ---------------------------------------------------------------------
 
-    def _question(self, row: sqlite3.Row, question_id: str) -> tuple[CourseVersionPackage, CourseQuestion]:
+    def _question(
+        self, row: sqlite3.Row, question_id: str
+    ) -> tuple[CourseVersionPackage, CourseQuestion]:
         package = self.enrollments.package_for(row)
         question = package.question(question_id)
         if question is None:
             raise CourseError(CourseErrorCode.QUESTION_NOT_FOUND, "题目不存在", 404)
         self.enrollments.assert_learnable(row, question.lesson)
-        erratum = self.repository.retired(row["course_id"], row["course_version"], question.id, question.version)
+        erratum = self.repository.retired(
+            row["course_id"], row["course_version"], question.id, question.version
+        )
         if erratum is not None:
-            raise CourseError(CourseErrorCode.QUESTION_RETIRED, f"这道题已撤下：{erratum.reason}", 410)
+            raise CourseError(
+                CourseErrorCode.QUESTION_RETIRED, f"这道题已撤下：{erratum.reason}", 410
+            )
         return package, question
 
     def _stored(self, enrollment_id: str, submission_id: str) -> sqlite3.Row | None:
@@ -342,16 +352,24 @@ class PracticeService:
         if stored["question_id"] != question_id or stored["answer_hash"] != answer_hash:
             raise CourseError(
                 CourseErrorCode.SUBMISSION_CONFLICT,
-                "同一个提交 ID 对应了不同的答案；请重新提交", 409,
+                "同一个提交 ID 对应了不同的答案；请重新提交",
+                409,
             )
         if stored["status"] == "failed":
             return None  # 上次评分失败、没计分：同一次提交可以直接重试
-        if stored["status"] == "pending" and time.time() - stored["updated_at"] > _PENDING_STALE_SECONDS:
+        if (
+            stored["status"] == "pending"
+            and time.time() - stored["updated_at"] > _PENDING_STALE_SECONDS
+        ):
             return None  # 上次评分中途中断，允许接着评
         return self._result_from_row(stored, replayed=True)
 
     def _graded_payload(
-        self, package: CourseVersionPackage, question: CourseQuestion, verdict: dict, mastery: float | None
+        self,
+        package: CourseVersionPackage,
+        question: CourseQuestion,
+        verdict: dict,
+        mastery: float | None,
     ) -> dict:
         return {
             "result": verdict["result"],

@@ -45,7 +45,9 @@ def version_key(version: str) -> tuple[int, int, int]:
 
 def _check_id(value: str, what: str) -> str:
     if not isinstance(value, str) or not ID_PATTERN.match(value):
-        raise ValueError(f"{what} {value!r} 不合法：只能用小写字母、数字、- 和 _，且以字母或数字开头")
+        raise ValueError(
+            f"{what} {value!r} 不合法：只能用小写字母、数字、- 和 _，且以字母或数字开头"
+        )
     return value
 
 
@@ -98,8 +100,11 @@ class CourseIssue(BaseModel):
 
 
 def error_detail(code: CourseErrorCode, message: str, **extra: Any) -> dict[str, Any]:
-    """接口错误统一长这样：``{"code": ..., "message": ...}``，放在 HTTPException.detail 里。"""
-    return {"code": code.value, "message": message, **extra}
+    """接口错误统一长这样：``{"code": ..., "message": ...}``，放在 HTTPException.detail 里。
+
+    同时给一份 ``error_code``：前端公共请求层（web/shared/api/client.ts）认的是这个字段名。
+    """
+    return {"code": code.value, "error_code": code.value, "message": message, **extra}
 
 
 # ── 课程包文件：course.json（课程级、可改） ─────────────────────────────────────
@@ -510,6 +515,8 @@ class EnrollmentMastery(BaseModel):
     lesson_id: str  # 所属课时：复习任务据此跳回原课时
     mastery: float
     mastered: bool
+    #: 做过理解检查：答过题（未作废）或在辅导里被评估过讲解。和"读过"、"掌握"都不同。
+    assessed: bool = False
     review_due_at: float | None = None
 
 

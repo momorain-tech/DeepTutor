@@ -95,7 +95,13 @@ GUEST_PATTERNS: list[tuple[re.Pattern[str], Callable[[str], Any]]] = [
 ]
 
 #: 匹配上了公共路径、但资源不存在（课程不存在或没发布）。中间件据此回 404 而不是 401。
-NOT_FOUND: dict[str, Any] = {"detail": {"code": "COURSE_NOT_FOUND", "message": "课程不存在或尚未发布"}}
+NOT_FOUND: dict[str, Any] = {
+    "detail": {
+        "code": "COURSE_NOT_FOUND",
+        "error_code": "COURSE_NOT_FOUND",
+        "message": "课程不存在或尚未发布",
+    }
+}
 
 
 async def guest_response(path: str, method: str) -> dict[str, Any] | None:

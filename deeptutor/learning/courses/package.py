@@ -265,7 +265,9 @@ def _check_question(
 ) -> None:
     lesson = lessons.get(question.lesson)
     if lesson is None:
-        report.add(CourseErrorCode.DANGLING_REFERENCE, f"引用了不存在的课时 {question.lesson!r}", where)
+        report.add(
+            CourseErrorCode.DANGLING_REFERENCE, f"引用了不存在的课时 {question.lesson!r}", where
+        )
     elif question.knowledge_point not in lesson.knowledge_points:
         report.add(
             CourseErrorCode.DANGLING_REFERENCE,
@@ -274,7 +276,9 @@ def _check_question(
         )
     for source_id in question.sources:
         if source_id not in source_ids:
-            report.add(CourseErrorCode.DANGLING_REFERENCE, f"引用了不存在的来源 {source_id!r}", where)
+            report.add(
+                CourseErrorCode.DANGLING_REFERENCE, f"引用了不存在的来源 {source_id!r}", where
+            )
 
     def bad(message: str) -> None:
         report.add(CourseErrorCode.QUESTION_INVALID, message, where)
@@ -381,7 +385,9 @@ def load_version(
                 where,
             )
         if status != VersionStatus.DRAFT and manifest.review is None:
-            report.add(CourseErrorCode.REVIEW_MISSING, "已发布或已撤下的版本必须有审核信息 review", where)
+            report.add(
+                CourseErrorCode.REVIEW_MISSING, "已发布或已撤下的版本必须有审核信息 review", where
+            )
 
     sources = sources_file.sources if sources_file is not None else []
     source_ids = {item.id for item in sources}
@@ -484,7 +490,9 @@ def load_version(
                         where,
                     )
                 elif parent == kp.id:
-                    report.add(CourseErrorCode.PREREQUISITE_CYCLE, f"知识点 {kp.id!r} 把自己当前置", where)
+                    report.add(
+                        CourseErrorCode.PREREQUISITE_CYCLE, f"知识点 {kp.id!r} 把自己当前置", where
+                    )
                 elif lessons_of_kp and owner.get(parent):
                     own = lessons[lessons_of_kp[0]].order if lessons_of_kp[0] in lessons else 0
                     other = lessons[owner[parent][0]].order if owner[parent][0] in lessons else 0
@@ -522,7 +530,9 @@ def load_version(
 
     questions = questions_file.questions if questions_file is not None else []
     for dupe in _duplicates([item.id for item in questions]):
-        report.add(CourseErrorCode.DUPLICATE_ID, f"题目 ID {dupe!r} 重复", f"{label}/questions.json")
+        report.add(
+            CourseErrorCode.DUPLICATE_ID, f"题目 ID {dupe!r} 重复", f"{label}/questions.json"
+        )
     if outline is not None:
         for question in questions:
             _check_question(
@@ -561,12 +571,16 @@ def load_course(course_root: Path) -> tuple[CoursePackage | None, ValidationRepo
     course_id = course_root.name
     where = f"{course_id}/course.json"
     if not ID_PATTERN.match(course_id):
-        report.add(CourseErrorCode.FIELD_INVALID, f"课程目录名 {course_id!r} 不是合法 ID", course_id)
+        report.add(
+            CourseErrorCode.FIELD_INVALID, f"课程目录名 {course_id!r} 不是合法 ID", course_id
+        )
         return None, report
     if course_root.is_symlink():
         report.add(CourseErrorCode.ILLEGAL_PATH, "课程目录不能是软链接", course_id)
         return None, report
-    record = _parse(CourseRecord, _read_json(course_root / "course.json", report, where), report, where)
+    record = _parse(
+        CourseRecord, _read_json(course_root / "course.json", report, where), report, where
+    )
     if record is None:
         return None, report
     if record.schema_version != SCHEMA_VERSION:

@@ -7,8 +7,8 @@ import json
 
 import pytest
 
-import deeptutor.learning.courses.practice as practice_module
 from deeptutor.learning.courses.enrollment import CourseError
+import deeptutor.learning.courses.practice as practice_module
 from deeptutor.learning.courses.practice import PracticeService, attempt_question_id
 
 from .conftest import COURSE, edit_json
@@ -102,7 +102,9 @@ def test_open_question_calls_model_once_across_retries(setup, monkeypatch):
     async def concurrent():
         return await asyncio.gather(
             *[
-                service.submit(enrollment.enrollment_id, "q-combo-open", "sub-open-0001", "先看闪烁的")
+                service.submit(
+                    enrollment.enrollment_id, "q-combo-open", "sub-open-0001", "先看闪烁的"
+                )
                 for _ in range(4)
             ]
         )
@@ -110,7 +112,9 @@ def test_open_question_calls_model_once_across_retries(setup, monkeypatch):
     results = run(concurrent())
     assert len(calls) == 1
     assert sorted(r.status for r in results).count("graded") >= 1
-    final = run(service.submit(enrollment.enrollment_id, "q-combo-open", "sub-open-0001", "先看闪烁的"))
+    final = run(
+        service.submit(enrollment.enrollment_id, "q-combo-open", "sub-open-0001", "先看闪烁的")
+    )
     assert final.status == "graded" and final.result == "partial" and final.replayed
     assert len(attempts(service, enrollment)) == 1
 
@@ -119,7 +123,9 @@ def test_open_question_model_failure_does_not_score(setup, monkeypatch):
     service, enrollment = setup
 
     async def failing(*_a):
-        raise CourseError(practice_module.CourseErrorCode.SUBMISSION_CONFLICT, "评分暂时不可用", 503)
+        raise CourseError(
+            practice_module.CourseErrorCode.SUBMISSION_CONFLICT, "评分暂时不可用", 503
+        )
 
     monkeypatch.setattr(practice_module, "judge_open_answer", failing)
     with pytest.raises(CourseError):

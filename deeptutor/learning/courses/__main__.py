@@ -28,8 +28,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "lock":
         # 锁文件只"追加新发布的版本"；已登记但哈希不符的照旧报错，不会被悄悄改写。
         modified = [i for i in report.errors if i.code.value == "COURSE_VERSION_MODIFIED"]
-        others = [i for i in report.errors if i.code.value not in {
-            "COURSE_VERSION_MODIFIED", "COURSE_VERSION_UNLOCKED"}]
+        others = [
+            i
+            for i in report.errors
+            if i.code.value not in {"COURSE_VERSION_MODIFIED", "COURSE_VERSION_UNLOCKED"}
+        ]
         for issue in modified + others:
             print(f"[error] {issue.where}: {issue.message} ({issue.code.value})")
         if modified or others:

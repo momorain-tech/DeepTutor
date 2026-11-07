@@ -54,7 +54,9 @@ def publish_new_version(catalog: Path, version: str = "1.1.0", *, title: str = "
     """复制 1.0.0 成新版本、改个标题、发布并写锁——模拟课程更新。"""
     course_root = catalog / COURSE
     shutil.copytree(course_root / "1.0.0", course_root / version)
-    edit_json(course_root / version / "manifest.json", lambda d: d.update(version=version, title=title))
+    edit_json(
+        course_root / version / "manifest.json", lambda d: d.update(version=version, title=title)
+    )
     edit_json(course_root / "course.json", lambda d: d["versions"].update({version: "published"}))
     courses, report = scan_catalog(catalog)
     write_lockfile(catalog, check_lock(catalog, courses, report))

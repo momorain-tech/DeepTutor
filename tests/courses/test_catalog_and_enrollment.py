@@ -22,7 +22,14 @@ from .conftest import COURSE, edit_json, make_store, publish_new_version
 
 # ── P1 ───────────────────────────────────────────────────────────────────────
 
-SECRETS = ["reference_answer", "可以进港但", "教材第 1 课：绿灯", "accepted", "rubric", "停船等待\"]"]
+SECRETS = [
+    "reference_answer",
+    "可以进港但",
+    "教材第 1 课：绿灯",
+    "accepted",
+    "rubric",
+    '停船等待"]',
+]
 
 
 def test_public_list_and_detail_never_contain_answers(repo: CourseRepository):
@@ -47,7 +54,9 @@ def test_drafts_and_withdrawn_versions_are_not_listed(catalog: Path, repo: Cours
     edit_json(catalog / COURSE / "course.json", lambda d: d["versions"].update({"1.0.0": "draft"}))
     assert repo.list_courses() == []
     assert repo.course_detail(COURSE) is None
-    edit_json(catalog / COURSE / "course.json", lambda d: d["versions"].update({"1.0.0": "withdrawn"}))
+    edit_json(
+        catalog / COURSE / "course.json", lambda d: d["versions"].update({"1.0.0": "withdrawn"})
+    )
     assert repo.list_courses() == []
     # 已撤下的版本，已加入的学员仍能读
     assert repo.learnable_version(COURSE, "1.0.0") is not None
@@ -62,7 +71,9 @@ def test_runtime_refuses_version_whose_hash_changed(catalog: Path, repo: CourseR
 # ── P2 ───────────────────────────────────────────────────────────────────────
 
 
-def test_enroll_builds_a_path_without_calling_any_model(enrollments: EnrollmentService, monkeypatch):
+def test_enroll_builds_a_path_without_calling_any_model(
+    enrollments: EnrollmentService, monkeypatch
+):
     import deeptutor.learning.topic_naming as naming
 
     def boom(*_a, **_k):
@@ -73,16 +84,26 @@ def test_enroll_builds_a_path_without_calling_any_model(enrollments: EnrollmentS
     assert created and enrollment.course_version == "1.0.0"
     progress = enrollments.store.load(enrollment.path_id)
     assert progress.name == "示例课程：灯塔信号"
-    assert [module.name for module in progress.modules] == ["第 1 课 · 三种灯色", "第 2 课 · 组合信号"]
+    assert [module.name for module in progress.modules] == [
+        "第 1 课 · 三种灯色",
+        "第 2 课 · 组合信号",
+    ]
     kp_map = enrollments.mapping(enrollment.enrollment_id, "knowledge_point")
-    combo = next(kp for m in progress.modules for kp in m.knowledge_points if kp.id == kp_map["combo-reading"])
+    combo = next(
+        kp
+        for m in progress.modules
+        for kp in m.knowledge_points
+        if kp.id == kp_map["combo-reading"]
+    )
     assert set(combo.prerequisite_ids) == {kp_map["color-meaning"], kp_map["steady-vs-blink"]}
     topic = enrollments.store.get_topic(enrollment.path_id)
     assert [source.kind.value for source in topic.sources] == ["course", "course"]
     assert [lesson.state for lesson in enrollment.lessons] == ["not_started", "not_started"]
 
 
-def test_repeat_and_concurrent_enroll_return_one_instance(enrollments: EnrollmentService, store, repo):
+def test_repeat_and_concurrent_enroll_return_one_instance(
+    enrollments: EnrollmentService, store, repo
+):
     def run(_):
         return EnrollmentService(store, repo).enroll(COURSE)
 
@@ -132,7 +153,9 @@ def test_closed_enrollment(catalog, enrollments):
 
 def test_withdrawing_course_keeps_learner_records(catalog, enrollments):
     enrollment, _ = enrollments.enroll(COURSE)
-    edit_json(catalog / COURSE / "course.json", lambda d: d["versions"].update({"1.0.0": "withdrawn"}))
+    edit_json(
+        catalog / COURSE / "course.json", lambda d: d["versions"].update({"1.0.0": "withdrawn"})
+    )
     again = enrollments.describe(enrollment.enrollment_id)
     assert again.course_version == "1.0.0" and len(again.lessons) == 2
 
@@ -230,3 +253,22 @@ def test_suspended_lesson_is_not_taught(catalog, enrollments, current_store):
     rows = build_topic_materials(enrollments.store.get_topic(enrollment.path_id).sources).materials
     assert [m.readable for m in rows] == [False, True]
     assert "suspended" in rows[0].note
+
+
+def test_tutoring_turn_manifest_includes_course_lessons(enrollments, store, monkeypatch):
+    """走辅导回合真正调用的那个函数：清单里有两节课、read_source 能读到正文。"""
+    import deeptutor.learning.storage as storage_module
+    from deeptutor.services.session._turn_runtime_shared import _topic_material_manifest
+
+    enrollment, _ = enrollments.enroll(COURSE)
+    root = store._root
+
+    class CurrentUserStore(storage_module.LearningStore):
+        def __init__(self, root_arg=None):
+            super().__init__(root_arg or root)
+
+    monkeypatch.setattr(storage_module, "LearningStore", CurrentUserStore)
+    manifest, index = _topic_material_manifest(enrollment.path_id)
+    assert f"id=course:{COURSE}@1.0.0/colors" in manifest
+    assert f"id=course:{COURSE}@1.0.0/combos" in manifest
+    assert "灯色与含义" in index[f"course:{COURSE}@1.0.0/colors"]

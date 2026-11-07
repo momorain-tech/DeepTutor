@@ -96,11 +96,14 @@ def load_course_material(source: Any, label: str) -> TopicMaterial:
     content = repository.lesson_content(package, lesson)
     anchors = content.anchors
     kp_lines = [
-        f"- {kp.name}（{kp.type}）" + (f"  位置: #{', #'.join(item.anchors)}" if item.anchors else "")
+        f"- {kp.name}（{kp.type}）"
+        + (f"  位置: #{', #'.join(item.anchors)}" if item.anchors else "")
         for kp in content.lesson.knowledge_points
         if (item := package.knowledge_point(kp.id)) is not None
     ]
-    sources = [public_source(src) for src in package.sources if src.id in {s.id for s in content.sources}]
+    sources = [
+        public_source(src) for src in package.sources if src.id in {s.id for s in content.sources}
+    ]
     source_lines = [
         f"- [{src.id}] {src.title}"
         + (f"，{src.locator}" if src.locator else "")

@@ -100,3 +100,14 @@ npm run build
 ```sh
 uv pip compile requirements/full.txt --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --index-url https://pypi.tuna.tsinghua.edu.cn/simple -o requirements/momorain-linux.lock
 ```
+
+## 官方课程
+
+课程包随后端代码一起发布，放在 `deeptutor/learning/courses/catalog/`；格式、接口、撤下与撤题操作见
+`deeptutor/learning/courses/CONTRACT.md`。
+
+- 发布前：`python -m deeptutor.learning.courses validate`（CI 同样会跑），新发布的版本用 `lock` 写入哈希。
+- 不需要新的环境变量或数据卷；选课数据存在现有 `deeptutor-data` 卷的学习库里，`backup.py` 已覆盖。
+- 访客能读 `/api/courses`、`/api/courses/<id>`、`/api/courses/<id>/preview`，其余课程接口要登录。
+- 浏览、加入、阅读、客观题都不调用模型；只有学员主动发起的辅导和开放题评分会按用户计费。
+- 本机联调：`DEEPTUTOR_COURSES_DIR=tests/fixtures/courses/catalog` 指向虚构的模拟课程。

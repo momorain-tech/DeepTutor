@@ -68,7 +68,9 @@ async def test_guest_browses_catalog_and_preview_without_side_effects(calls):
         # 路径参数不合法的不在白名单里 → 401，不会被当成课程 ID 去读文件
         assert (await c.get("/api/courses/..%2F..%2Fetc")).status_code in {401, 404}
         assert (await c.get("/api/course-enrollments")).status_code == 401
-        assert (await c.post("/api/course-enrollments", json={"course_id": "demo-signals"})).status_code == 401
+        assert (
+            await c.post("/api/course-enrollments", json={"course_id": "demo-signals"})
+        ).status_code == 401
     assert not paths.USERS_ROOT.exists() or not any(paths.USERS_ROOT.iterdir())
     assert not any("provision" in url for url in calls)
 
@@ -76,15 +78,23 @@ async def test_guest_browses_catalog_and_preview_without_side_effects(calls):
 @pytest.mark.asyncio
 async def test_enroll_study_and_practice_over_http(calls):
     async with client() as c:
-        first = await c.post("/api/course-enrollments", json={"course_id": "demo-signals"}, headers=ALICE)
+        first = await c.post(
+            "/api/course-enrollments", json={"course_id": "demo-signals"}, headers=ALICE
+        )
         assert first.status_code == 201
         enrollment = first.json()["enrollment"]
         eid = enrollment["enrollment_id"]
-        again = await c.post("/api/course-enrollments", json={"course_id": "demo-signals"}, headers=ALICE)
+        again = await c.post(
+            "/api/course-enrollments", json={"course_id": "demo-signals"}, headers=ALICE
+        )
         assert again.status_code == 200 and again.json()["enrollment"]["enrollment_id"] == eid
 
-        lesson = (await c.get(f"/api/course-enrollments/{eid}/lessons/colors", headers=ALICE)).json()
-        assert lesson["content"]["lesson"]["id"] == "colors" and lesson["next_lesson_id"] == "combos"
+        lesson = (
+            await c.get(f"/api/course-enrollments/{eid}/lessons/colors", headers=ALICE)
+        ).json()
+        assert (
+            lesson["content"]["lesson"]["id"] == "colors" and lesson["next_lesson_id"] == "combos"
+        )
         progress = await c.put(
             f"/api/course-enrollments/{eid}/lessons/colors/progress",
             json={"anchor": "three-colors", "percentage": 0.4},
@@ -92,15 +102,32 @@ async def test_enroll_study_and_practice_over_http(calls):
         )
         assert progress.json()["state"] == "reading"
 
-        questions = (await c.get(f"/api/course-enrollments/{eid}/lessons/colors/questions", headers=ALICE)).json()
+        questions = (
+            await c.get(f"/api/course-enrollments/{eid}/lessons/colors/questions", headers=ALICE)
+        ).json()
         assert "answer" not in questions["questions"][0]
         body = {"submission_id": "sub-http-0001", "answer": "A"}
-        graded = (await c.post(f"/api/course-enrollments/{eid}/questions/q-green/submissions", json=body, headers=ALICE)).json()
-        replay = (await c.post(f"/api/course-enrollments/{eid}/questions/q-green/submissions", json=body, headers=ALICE)).json()
+        graded = (
+            await c.post(
+                f"/api/course-enrollments/{eid}/questions/q-green/submissions",
+                json=body,
+                headers=ALICE,
+            )
+        ).json()
+        replay = (
+            await c.post(
+                f"/api/course-enrollments/{eid}/questions/q-green/submissions",
+                json=body,
+                headers=ALICE,
+            )
+        ).json()
         assert graded["result"] == "correct" and not graded["replayed"] and replay["replayed"]
 
         # bob 看不到 alice 的实例
-        for path in [f"/api/course-enrollments/{eid}", f"/api/course-enrollments/{eid}/lessons/colors"]:
+        for path in [
+            f"/api/course-enrollments/{eid}",
+            f"/api/course-enrollments/{eid}/lessons/colors",
+        ]:
             denied = await c.get(path, headers=BOB)
             assert denied.status_code == 404
             assert denied.json()["detail"]["code"] == "COURSE_ENROLLMENT_NOT_FOUND"

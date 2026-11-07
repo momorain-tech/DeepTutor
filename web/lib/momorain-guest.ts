@@ -28,7 +28,18 @@ export const GUEST_PATHS: ReadonlySet<string> = new Set([
   "/api/settings/page-customization",
   "/api/modules",
   "/api/capabilities/registered",
+  // 官方课程目录（课程详情和公开样课见下面的 GUEST_PATTERNS）
+  "/api/courses",
 ]);
+
+/**
+ * 带参数的公共只读接口，对应后端 guest.py 的 GUEST_PATTERNS。
+ * 课程 ID 的字符集和后端一致，不合法的路径直接不在白名单里。
+ */
+export const GUEST_PATTERNS: readonly RegExp[] = [
+  /^\/api\/courses\/[a-z0-9][a-z0-9_-]{0,63}$/,
+  /^\/api\/courses\/[a-z0-9][a-z0-9_-]{0,63}\/preview$/,
+];
 
 /** unknown = 还没问过后端；guest = 未登录；user = 已登录。 */
 export type Principal = "unknown" | "guest" | "user";
@@ -116,7 +127,8 @@ export function apiPathOf(input: string): string {
 }
 
 export function isGuestReadable(path: string, method: string): boolean {
-  return (method === "GET" || method === "HEAD") && GUEST_PATHS.has(path);
+  if (method !== "GET" && method !== "HEAD") return false;
+  return GUEST_PATHS.has(path) || GUEST_PATTERNS.some((pattern) => pattern.test(path));
 }
 
 // ---- 「需要登录」的提示 ----

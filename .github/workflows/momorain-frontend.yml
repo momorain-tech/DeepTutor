@@ -26,7 +26,16 @@ jobs:
         working-directory: web
         run: |
           npm run typecheck
-          npx vitest run tests/momorain-base-path.spec.ts tests/momorain-guest.spec.ts
+          npx vitest run tests/momorain-base-path.spec.ts tests/momorain-guest.spec.ts tests/momorain-courses.spec.ts
+      # 官方课程包：格式、引用、受限 Markdown、已发布版本哈希锁。任何一项不过都不发布。
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 官方课程包校验
+        run: |
+          pip install "pydantic>=2"
+          python -m deeptutor.learning.courses validate
+          python -m deeptutor.learning.courses validate tests/fixtures/courses/catalog
       - name: 登录草稿真实浏览器回归
         working-directory: web
         run: |

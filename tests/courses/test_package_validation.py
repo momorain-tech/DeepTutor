@@ -41,26 +41,90 @@ OUTLINE = f"{COURSE}/1.0.0/outline.json"
 @pytest.mark.parametrize(
     ("relative", "mutate", "expected"),
     [
-        (OUTLINE, lambda d: d["knowledge_points"].append(dict(d["knowledge_points"][0])), "COURSE_DUPLICATE_ID"),
-        (OUTLINE, lambda d: d["lessons"][0]["knowledge_points"].append("ghost"), "COURSE_DANGLING_REFERENCE"),
-        (OUTLINE, lambda d: d["knowledge_points"][0]["prerequisites"].append("combo-reading"), "COURSE_PREREQUISITE_CYCLE"),
-        (OUTLINE, lambda d: d["lessons"][0].update(material="../../../etc/passwd.md"), "COURSE_ILLEGAL_PATH"),
-        (OUTLINE, lambda d: d["lessons"][0].update(material="/abs/lessons/x.md"), "COURSE_ILLEGAL_PATH"),
-        (OUTLINE, lambda d: d["lessons"][0].update(material="lessons/colors.html"), "COURSE_ILLEGAL_PATH"),
+        (
+            OUTLINE,
+            lambda d: d["knowledge_points"].append(dict(d["knowledge_points"][0])),
+            "COURSE_DUPLICATE_ID",
+        ),
+        (
+            OUTLINE,
+            lambda d: d["lessons"][0]["knowledge_points"].append("ghost"),
+            "COURSE_DANGLING_REFERENCE",
+        ),
+        (
+            OUTLINE,
+            lambda d: d["knowledge_points"][0]["prerequisites"].append("combo-reading"),
+            "COURSE_PREREQUISITE_CYCLE",
+        ),
+        (
+            OUTLINE,
+            lambda d: d["lessons"][0].update(material="../../../etc/passwd.md"),
+            "COURSE_ILLEGAL_PATH",
+        ),
+        (
+            OUTLINE,
+            lambda d: d["lessons"][0].update(material="/abs/lessons/x.md"),
+            "COURSE_ILLEGAL_PATH",
+        ),
+        (
+            OUTLINE,
+            lambda d: d["lessons"][0].update(material="lessons/colors.html"),
+            "COURSE_ILLEGAL_PATH",
+        ),
         (OUTLINE, lambda d: d["lessons"][0].pop("objectives"), "COURSE_FIELD_INVALID"),
         (OUTLINE, lambda d: d["knowledge_points"][0].update(id="Bad ID"), "COURSE_FIELD_INVALID"),
-        (OUTLINE, lambda d: d["knowledge_points"][0]["anchors"].append("nowhere"), "COURSE_DANGLING_REFERENCE"),
-        (OUTLINE, lambda d: d["lessons"][1]["knowledge_points"].append("color-meaning"), "COURSE_ORPHAN_KNOWLEDGE_POINT"),
+        (
+            OUTLINE,
+            lambda d: d["knowledge_points"][0]["anchors"].append("nowhere"),
+            "COURSE_DANGLING_REFERENCE",
+        ),
+        (
+            OUTLINE,
+            lambda d: d["lessons"][1]["knowledge_points"].append("color-meaning"),
+            "COURSE_ORPHAN_KNOWLEDGE_POINT",
+        ),
         (OUTLINE, lambda d: d["lessons"][1].update(order=1), "COURSE_DUPLICATE_ID"),
-        (f"{COURSE}/1.0.0/manifest.json", lambda d: d.update(course_id="other"), "COURSE_ID_MISMATCH"),
-        (f"{COURSE}/1.0.0/manifest.json", lambda d: d.update(schema_version=99), "COURSE_SCHEMA_VERSION_UNSUPPORTED"),
+        (
+            f"{COURSE}/1.0.0/manifest.json",
+            lambda d: d.update(course_id="other"),
+            "COURSE_ID_MISMATCH",
+        ),
+        (
+            f"{COURSE}/1.0.0/manifest.json",
+            lambda d: d.update(schema_version=99),
+            "COURSE_SCHEMA_VERSION_UNSUPPORTED",
+        ),
         (f"{COURSE}/1.0.0/manifest.json", lambda d: d.pop("review"), "COURSE_REVIEW_MISSING"),
-        (f"{COURSE}/1.0.0/sources.json", lambda d: d["sources"][1].update(url="", locator=""), "COURSE_FIELD_INVALID"),
-        (f"{COURSE}/1.0.0/questions.json", lambda d: d["questions"][0]["answer"].update(choices=["Z"]), "COURSE_QUESTION_INVALID"),
-        (f"{COURSE}/1.0.0/questions.json", lambda d: d["questions"][0]["answer"].update(choices=["A", "B"]), "COURSE_QUESTION_INVALID"),
-        (f"{COURSE}/1.0.0/questions.json", lambda d: d["questions"][4].pop("rubric"), "COURSE_QUESTION_INVALID"),
-        (f"{COURSE}/1.0.0/questions.json", lambda d: d["questions"][0].update(knowledge_point="combo-reading"), "COURSE_DANGLING_REFERENCE"),
-        (f"{COURSE}/course.json", lambda d: d["versions"].update({"2.0.0": "draft"}), "COURSE_FILE_MISSING"),
+        (
+            f"{COURSE}/1.0.0/sources.json",
+            lambda d: d["sources"][1].update(url="", locator=""),
+            "COURSE_FIELD_INVALID",
+        ),
+        (
+            f"{COURSE}/1.0.0/questions.json",
+            lambda d: d["questions"][0]["answer"].update(choices=["Z"]),
+            "COURSE_QUESTION_INVALID",
+        ),
+        (
+            f"{COURSE}/1.0.0/questions.json",
+            lambda d: d["questions"][0]["answer"].update(choices=["A", "B"]),
+            "COURSE_QUESTION_INVALID",
+        ),
+        (
+            f"{COURSE}/1.0.0/questions.json",
+            lambda d: d["questions"][4].pop("rubric"),
+            "COURSE_QUESTION_INVALID",
+        ),
+        (
+            f"{COURSE}/1.0.0/questions.json",
+            lambda d: d["questions"][0].update(knowledge_point="combo-reading"),
+            "COURSE_DANGLING_REFERENCE",
+        ),
+        (
+            f"{COURSE}/course.json",
+            lambda d: d["versions"].update({"2.0.0": "draft"}),
+            "COURSE_FILE_MISSING",
+        ),
     ],
 )
 def test_broken_packages_are_reported(catalog: Path, relative, mutate, expected):
@@ -127,7 +191,9 @@ def test_one_broken_course_does_not_hide_others(catalog: Path):
     import shutil
 
     shutil.copytree(catalog / COURSE, catalog / "broken-course")
-    edit_json(catalog / "broken-course" / "course.json", lambda d: d.update(course_id="broken-course"))
+    edit_json(
+        catalog / "broken-course" / "course.json", lambda d: d.update(course_id="broken-course")
+    )
     edit_json(catalog / "broken-course" / "1.0.0" / "outline.json", lambda d: d["lessons"].clear())
     courses, report = scan_catalog(catalog)
     assert not report.ok

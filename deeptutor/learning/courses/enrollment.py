@@ -158,9 +158,7 @@ def _table_exists(conn: sqlite3.Connection) -> bool:
 def course_enrollment_for_path(conn: sqlite3.Connection, path_id: str) -> sqlite3.Row | None:
     if not _table_exists(conn):
         return None
-    return conn.execute(
-        "SELECT * FROM course_enrollments WHERE path_id = ?", (path_id,)
-    ).fetchone()
+    return conn.execute("SELECT * FROM course_enrollments WHERE path_id = ?", (path_id,)).fetchone()
 
 
 def assert_outline_editable(conn: sqlite3.Connection, path_id: str) -> None:
@@ -409,7 +407,9 @@ class EnrollmentService:
         lessons: list[LessonProgressRecord] = []
         if package is not None:
             for lesson in package.ordered_lessons():
-                lessons.append(progress_rows.get(lesson.id) or LessonProgressRecord(lesson_id=lesson.id))
+                lessons.append(
+                    progress_rows.get(lesson.id) or LessonProgressRecord(lesson_id=lesson.id)
+                )
         mastery, due_count = self._mastery(row)
         current = next((item.lesson_id for item in lessons if item.state != "read"), "")
         if not current and lessons:
@@ -454,9 +454,18 @@ class EnrollmentService:
                 EnrollmentMastery(
                     knowledge_point_id=course_kp,
                     path_knowledge_point_id=path_kp,
-                    lesson_id=(lesson.id if package and (lesson := package.lesson_of_knowledge_point(course_kp)) else ""),
+                    lesson_id=(
+                        lesson.id
+                        if package and (lesson := package.lesson_of_knowledge_point(course_kp))
+                        else ""
+                    ),
                     mastery=learning_policy.display_mastery(progress, kp),
                     mastered=learning_policy.is_mastered(progress, kp),
+                    assessed=any(
+                        a.knowledge_point_id == path_kp and not a.voided
+                        for a in progress.quiz_attempts
+                    )
+                    or path_kp in progress.qualitative_mastery,
                     review_due_at=scheduled.get(path_kp),
                 )
             )
@@ -482,18 +491,26 @@ class EnrollmentService:
             for row in rows
         }
 
-    def assert_learnable(self, row: sqlite3.Row, lesson_id: str | None = None) -> CourseVersionPackage:
+    def assert_learnable(
+        self, row: sqlite3.Row, lesson_id: str | None = None
+    ) -> CourseVersionPackage:
         """继续上课/答题前的检查：整门课暂停、课时暂停、课时不存在都明确报错。"""
         course = self.repository.course(row["course_id"])
         if course is not None and not course.record.learning_open:
-            raise CourseError(CourseErrorCode.LEARNING_CLOSED, "这门课暂停学习，你的记录都会保留", 409)
+            raise CourseError(
+                CourseErrorCode.LEARNING_CLOSED, "这门课暂停学习，你的记录都会保留", 409
+            )
         package = self.package_for(row)
         if lesson_id is not None:
             if package.lesson(lesson_id) is None:
                 raise CourseError(CourseErrorCode.LESSON_NOT_FOUND, "课时不存在", 404)
-            reason = self.repository.lesson_suspension(row["course_id"], row["course_version"], lesson_id)
+            reason = self.repository.lesson_suspension(
+                row["course_id"], row["course_version"], lesson_id
+            )
             if reason is not None:
-                raise CourseError(CourseErrorCode.LESSON_SUSPENDED, f"这节课暂停学习：{reason}", 409)
+                raise CourseError(
+                    CourseErrorCode.LESSON_SUSPENDED, f"这节课暂停学习：{reason}", 409
+                )
         return package
 
     def record_reading(
